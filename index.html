@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>x1eJian&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="x1eJian&#39;s blog">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;index.html">
+<meta property="og:site_name" content="x1eJian&#39;s blog">
+<meta property="og:locale" content="zh">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">x1eJian&#39;s blog</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-从零创建一个项目要做的工作（一）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
+  <time datetime="2020-02-23T14:41:33.734Z" itemprop="datePublished">2020-02-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <hr>
+<p>title: 从零创建一个项目要做的工作（一）<br>date: 2020-02-23 22:41:33<br>tags: JavaScript</p>
+<hr>
+<p>整理一下从零创建一个项目需要的工作内容，大体分为以下几点：</p>
+<ol>
+<li>dot files</li>
+<li>linter formatter</li>
+<li>webpack</li>
+<li>必要的集成库</li>
+<li>一些优化</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir my-project</span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$_</span></span><br><span class="line">git init</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="1-dot-files"><a href="#1-dot-files" class="headerlink" title="1.dot files"></a>1.dot files</h2><p>就是一些.开头的文件，大部分是一些配置文件。这些文件可以让协作开发的时候保持统一的风格，一般前端经常用到的是：</p>
+<ul>
+<li>.gitignore</li>
+<li>.editorconfig</li>
+<li>.eslintrc</li>
+<li>.npmrc</li>
+<li>LICENSE</li>
+<li>package.json</li>
+<li>settings.json（vsCode专属）</li>
+<li>README.md</li>
+</ul>
+<p>等等</p>
+<h3 id="gitignore"><a href="#gitignore" class="headerlink" title=".gitignore"></a>.gitignore</h3><p>在这可以配置一些文件，使其不被git监控，比如node_modules</p>
+<blockquote>
+<ul>
+<li>在当前文件使用ctrl+shift+P唤出命令面板，调用 Add gitignore 命令可以把当前文件加入ignore中</li>
+<li>此外除了gitignore外 还有其他的ignore文件比如.eslintignore 起的作用都是一样的，让程序忽略掉某些文件执行</li>
+</ul>
+</blockquote>
+<h3 id="editorconfig"><a href="#editorconfig" class="headerlink" title=".editorconfig"></a>.editorconfig</h3><p>使用这个文件，可以让我们的项目保持一定的代码风格（比如缩进、LF&amp;CRLF）<br>这是一份示例，在不同的浏览器中可以统一代码的风格</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root = true</span><br><span class="line"></span><br><span class="line">[*]</span><br><span class="line">indent_style = space</span><br><span class="line">indent_size = 2</span><br><span class="line">charset = utf-8</span><br><span class="line">trim_trailing_whitespace = false</span><br><span class="line">insert_final_newline = false</span><br><span class="line">end_of_line = unset</span><br></pre></td></tr></table></figure>
+
+<h3 id="npmrc"><a href="#npmrc" class="headerlink" title=".npmrc"></a>.npmrc</h3><p>由于某些不可抗之力，国内无论是访问 github 还是下载 npm 包都八是很行。对于国内用户而言，首先我们要做的一件事就是将 npm 源设置淘宝源或者使用verdaccio搭建npm私有源。一般都是使用nrm管理。.npmrc 就是给 npm 用的配置文件，当然你如果使用 yarn，yarn 也会遵守 .npmrc 配置，虽然 yarn 有专门的配置文件 .yarnrc。<br>我们知道有些 npm 包在安装时是需要下载一些二进制依赖文件，其中有几个坑货像 node-sass，electron，bcrypt 还需要配置代理才能下载。为了让让别人合作开发项目的时候能顺利安装它们，我们可以在 .npmrc 中直接设置它们的镜像地址，添加 node-sass 的镜像地址：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># .npmrc</span><br><span class="line">SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass</span><br></pre></td></tr></table></figure>
+
+<h3 id="LICENSE"><a href="#LICENSE" class="headerlink" title="LICENSE"></a>LICENSE</h3><p>我们可以从<a href="http://choosealicense.online/" target="_blank" rel="noopener">这个网站</a>中获取一些关于协议的信息，然后复制到我们的项目中根目录的LICENSE文件中。只需要修改其中的年份和作者名即可。</p>
+<h3 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h3><p>最核心的配置文件，在这个配置文件中我们可以配置一些项目的名称、依赖、author等<br>初始化是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 生成一个默认的配置文件</span><br><span class="line">npm init -y</span><br><span class="line">yarn init -y</span><br></pre></td></tr></table></figure>
+<ul>
+<li>scripts是npm提供给我们运行shell命令的入口,在这个配置项中我们可以配置一些命令来对项目进行某些操作，使用最多的就是npm run dev = =</li>
+<li>dependencies与devDependencies看起来差不多，他们都是标注项目的依赖列表不同的是，dependencies是项目运行时必要依赖，而devDependencies是项目开发时所需依赖。</li>
+<li>dependencies与devDependencies可以使用很多写法来表明依赖的版本，以下是npm官方给出的例子<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"foo"</span>: <span class="string">"1.0.0 - 2.9999.9999"</span>,</span><br><span class="line">    <span class="attr">"bar"</span>: <span class="string">"&gt;=1.0.2 &lt;2.1.2"</span>,</span><br><span class="line">    <span class="attr">"baz"</span>: <span class="string">"&gt;1.0.2 &lt;=2.3.4"</span>,</span><br><span class="line">    <span class="attr">"boo"</span>: <span class="string">"2.0.1"</span>,</span><br><span class="line">    <span class="attr">"qux"</span>: <span class="string">"&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0"</span>,</span><br><span class="line">    <span class="attr">"asd"</span>: <span class="string">"http://asdf.com/asdf.tar.gz"</span>,</span><br><span class="line">    <span class="attr">"til"</span>: <span class="string">"~1.2"</span>,</span><br><span class="line">    <span class="attr">"elf"</span>: <span class="string">"~1.2.3"</span>,</span><br><span class="line">    <span class="attr">"two"</span>: <span class="string">"2.x"</span>,</span><br><span class="line">    <span class="attr">"thr"</span>: <span class="string">"3.3.x"</span>,</span><br><span class="line">    <span class="attr">"lat"</span>: <span class="string">"latest"</span>,</span><br><span class="line">    <span class="attr">"dyl"</span>: <span class="string">"file:../dyl"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+大体上分为三种</li>
+</ul>
+<ol>
+<li>明确版本号，即 “1.0.0”</li>
+<li>版本号区间，有多种写法，支持比较表达式以及或运算，即 “&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0”</li>
+<li>模糊匹配，其中模糊匹配分为：<ul>
+<li>2.x 会匹配所有2.0.0到3.0.0之间的版本，比如2.x会匹配2.0.0 和 2.3.5，但不包括3.0.0</li>
+<li>会匹配最近的小版本依赖包，比如~1.1.3会匹配所有1.1.x版本，但是不包括1.1.0</li>
+<li>会匹配最新的大版本依赖包，比如^2.2.2会匹配所有2.x.x的包，包括2.3.0，但是不包括3.0.0</li>
+<li>会匹配所有版本</li>
+<li>会匹配所有版本</li>
+<li>latest 会匹配一个给定的特殊tag版本</li>
+<li>http 或者 git 路径 会匹配给定url地址（git, git+ssh, git+http, git+https, git+file.）</li>
+<li>本地路径会匹配本地文件包，不过此路径使用需要先初始化本地依赖包</li>
+</ul>
+</li>
+</ol>
+<h3 id="travis-yml"><a href="#travis-yml" class="headerlink" title=".travis.yml"></a>.travis.yml</h3><p>我选择使用最流行的开源 CI 工具 travis CI，在 github 上新建完仓库后就可以去 travis CI 官网，先同步 github 账号信息，然后搜索激活新建的仓库。<br>在项目根目录新建 .travis.yml 文件，加入以下内容：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span> <span class="string">test</span></span><br></pre></td></tr></table></figure>
+<p>非常简单的配置，只是负责自动化测试。因为目前没有测试，我们添加一个 echo 语句到 npm scripts 里面：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json</span></span><br><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"test"</span>: <span class="string">"echo 'skip test...'"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="README-md"><a href="#README-md" class="headerlink" title="README.md"></a>README.md</h3><p>README.md 就是项目的说明书，每个文件夹中的 README.md 在 github 上都会被渲染到页面上。我们在项目根目录添加的 README.md 自然就会被渲染到仓库的首页。</p>
+<p>我们添加一些实用的 badges（徽章），例如 travis CI 的 build 状态，dependencies 版本是否过期等 。badge 本质上就是一个链接，只不过文字部分换成了 svg 渲染的图片，我们可以在网站 <a href="https://shields.io/" target="_blank" rel="noopener">shields.io</a> 上找到各种各样的 badge，平时逛 github 项目的时候看到喜欢的 badge 可用注意收藏一下。<br>例如：<a href="https://circleci.com/gh/ant-design/ant-design" target="_blank" rel="noopener"><img src="https://img.shields.io/circleci/project/github/ant-design/ant-design/master.svg?style=flat-square" alt="CircleCI branch"></a> <img src="https://github.com/ant-design/ant-design/workflows/test/badge.svg" alt="CI Status"> <a href="https://codecov.io/gh/ant-design/ant-design/branch/master" target="_blank" rel="noopener"><img src="https://img.shields.io/codecov/c/github/ant-design/ant-design/master.svg?style=flat-square" alt="Codecov"></a> <a href="https://www.npmjs.com/package/antd" target="_blank" rel="noopener"><img src="https://flat.badgen.net/npm/v/antd?icon=npm" alt=""></a></p>
+<p>还有一些其他的dot file具体使用就要看对应的文档了，这是搭建项目的第一步，接下来会继续更新…</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck6z734rd0003ykjf31jm9nlt" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-记录一些使用TypeScript时碰到的坑点" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" class="article-date">
+  <time datetime="2020-01-20T06:04:59.000Z" itemprop="datePublished">2020-01-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/">TypeScript————类型相关总结</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="1-interface-和-type"><a href="#1-interface-和-type" class="headerlink" title="1. interface 和 type"></a>1. interface 和 type</h3><p>interface 的特点</p>
+<ol>
+<li>interface 和同名 interface、class 自动聚合</li>
+<li>自身只能表示 object/class/function 的类型</li>
+</ol>
+<p>type 特点</p>
+<ol>
+<li>不局限于 object/class/function</li>
+<li>不可以重名</li>
+<li>更复杂的类型操作</li>
+</ol>
+<p>所以一般是自用一般是 type 提供 api 相关用 interface</p>
+<h3 id="2-amp-操作符"><a href="#2-amp-操作符" class="headerlink" title="2. &amp; | 操作符"></a>2. &amp; | 操作符</h3><p>只是写法上跟位运算符相同，实际意义为：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> IA &#123;</span><br><span class="line">  a: <span class="built_in">number</span>;</span><br><span class="line">  b: <span class="built_in">number</span>[];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> IB &#123;</span><br><span class="line">  b: <span class="built_in">number</span>[];</span><br><span class="line">  c: <span class="built_in">string</span>[];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TA = IA | IB; <span class="comment">// 包含ab或者bc即可</span></span><br><span class="line"><span class="keyword">type</span> TB = IA &amp; IB; <span class="comment">// 必须包含abc</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-泛型"><a href="#3-泛型" class="headerlink" title="3. 泛型"></a>3. 泛型</h3><p>在定义一个函数、type、interface、class 时，在名称后面加上&lt;&gt;表示即接受类型参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 定义</span><br><span class="line">class React.Component&lt;P = &#123;&#125;, S = &#123;&#125;, SS = any&gt; &#123;&#125;</span><br><span class="line">// 调用</span><br><span class="line">class Login extends React.Component&lt;ILoginProps, ILoginState&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-复杂的条件类型"><a href="#4-复杂的条件类型" class="headerlink" title="4. 复杂的条件类型"></a>4. 复杂的条件类型</h3><p>条件也支持运算 与三目运算类似</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> IsEqualType&lt;A, B&gt; = A <span class="keyword">extends</span> B ? (B <span class="keyword">extends</span> A ? <span class="literal">true</span> : <span class="literal">false</span>) : <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">type</span> NumberEqualsToString = IsEqualType&lt;<span class="built_in">number</span>, <span class="built_in">string</span>&gt;; <span class="comment">// false</span></span><br><span class="line"><span class="keyword">type</span> NumberEqualsToNumber = IsEqualType&lt;<span class="built_in">number</span>, <span class="built_in">number</span>&gt;; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-其他环境的变量"><a href="#5-其他环境的变量" class="headerlink" title="5. 其他环境的变量"></a>5. 其他环境的变量</h3><p>在实际应用开发时有一种场景，当前作用域下可以访问某个变量，但这个变量并不由开发者控制。例如通过 Script 标签直接引入的第三方库 CDN、一些宿主环境的 api 等。这个时候可以利用 ts 的环境声明功能，来告诉 TS 当前作用域可以访问这些变量，以获得类型提醒。</p>
+<ol>
+<li>declare</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">declare</span> <span class="keyword">const</span> IS_MOBILE = <span class="literal">true</span>; <span class="comment">// 编译后此行消失</span></span><br><span class="line"><span class="keyword">const</span> wording = IS_MOBILE ? <span class="string">'移动端'</span> : <span class="string">'PC端'</span>;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>/// 指令</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;reference path="../typings/monaco.d.ts" /&gt;</span></span><br><span class="line"><span class="keyword">const</span> range = <span class="keyword">new</span> monaco.Range(<span class="number">2</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-类型转换"><a href="#6-类型转换" class="headerlink" title="6. 类型转换"></a>6. 类型转换</h3><p>以下是常见的类型转换方法</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// set</span></span><br><span class="line"><span class="keyword">type</span> TSize = <span class="string">'small'</span> | <span class="string">'default'</span> | <span class="string">'big'</span> | <span class="string">'large'</span>;</span><br><span class="line"><span class="comment">// map</span></span><br><span class="line"><span class="keyword">interface</span> IA &#123;</span><br><span class="line">  a: <span class="built_in">number</span>;</span><br><span class="line">  b: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// map =&gt; set</span></span><br><span class="line"><span class="keyword">type</span> IAKeys = keyof IA; <span class="comment">// "a" | "b"</span></span><br><span class="line"><span class="keyword">type</span> IAValues = IA[keyof IA]; <span class="comment">// string | number</span></span><br><span class="line"><span class="comment">// set =&gt; map</span></span><br><span class="line"><span class="keyword">type</span> TMap = &#123;</span><br><span class="line">  [k <span class="keyword">in</span> TSize]: <span class="built_in">number</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 根据索引取值</span></span><br><span class="line"><span class="keyword">type</span> SubA = IA[<span class="string">'a'</span>]; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-工具类型"><a href="#7-工具类型" class="headerlink" title="7. 工具类型"></a>7. 工具类型</h3><p>这些类型一般当作工具函数来生成一些派生类型</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Size = <span class="string">'small'</span> | <span class="string">'default'</span> | <span class="string">'big'</span>;</span><br><span class="line"><span class="keyword">type</span> Result = <span class="number">1</span> | <span class="number">2</span> | <span class="number">3</span> | <span class="string">'error'</span> | <span class="string">'success'</span>;</span><br><span class="line"><span class="keyword">type</span> Record&lt;K <span class="keyword">extends</span> keyof <span class="built_in">any</span>, T&gt; = &#123; [P <span class="keyword">in</span> K]: T &#125;; <span class="comment">// set =&gt; map</span></span><br><span class="line"><span class="keyword">type</span> Extract&lt;T, U&gt; = T <span class="keyword">extends</span> U ? T : never; <span class="comment">// 保留set的一部分</span></span><br><span class="line"><span class="keyword">type</span> Exclude&lt;T, U&gt; = T <span class="keyword">extends</span> U ? never : T; <span class="comment">// 删除set的一部分</span></span><br><span class="line"><span class="keyword">type</span> Pick&lt;T, K <span class="keyword">extends</span> keyof T&gt; = &#123; [P <span class="keyword">in</span> K]: T[P] &#125;; <span class="comment">// 保留map的某些属性</span></span><br><span class="line"><span class="keyword">type</span> Omit&lt;T, K&gt; = Pick&lt;T, Exclude&lt;keyof T, K&gt;&gt;; <span class="comment">// 删除map的某些属性</span></span><br><span class="line"><span class="keyword">type</span> SizeMap = Record&lt;Size, <span class="built_in">number</span>&gt;;</span><br><span class="line"><span class="keyword">type</span> StringResult = Extract&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 'error' | 'success</span></span><br><span class="line"><span class="keyword">type</span> NumericResult = Exclude&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 1 | 2 | 3</span></span><br><span class="line"><span class="keyword">type</span> BiggerSizeMap = Pick&lt;SizeMap, <span class="string">'default'</span> | <span class="string">'big'</span>&gt;; <span class="comment">// 保留了 default和 big</span></span><br><span class="line"><span class="keyword">type</span> DefaultSizeMap = Omit&lt;BiggerSizeMap, <span class="string">'big'</span>&gt;; <span class="comment">// 删除big</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：尽量不要滥用这些工具类型，使用过多的工具类型会使可读性变差，而且容易发生一些错误，契约高于实现，大部分情况还是使用直观的 interface、type。以上这些工具类型都已经包含在了 TS 标准库中，在应用中直接输入名字进行使用即可(老版本 typescript 需要手动写)。</p>
+</blockquote>
+<h3 id="8-never-infer-typeof-三个比较重要的参数"><a href="#8-never-infer-typeof-三个比较重要的参数" class="headerlink" title="8. never infer typeof 三个比较重要的参数"></a>8. never infer typeof 三个比较重要的参数</h3><p>先说三个概念：幺元、零元、逆元 用数字表示可以近似表示为 1 0 -1</p>
+<p>never 是 | 运算的幺元，即 x | never = x</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> NumericResult = Exclude&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 1 | 2 | 3</span></span><br><span class="line"><span class="comment">// 过程是 1 | 2 | 3 | 'error' | 'success' =&gt; 1 | 2 | 3 | never | never =&gt; 1 | 2 | 3</span></span><br></pre></td></tr></table></figure>
+
+<p>infer 的作用是让 TypeScript 自己推断，并将推断的结果存储到一个临时名字中，并且只能用于 extends 语句中。它与泛型的区别在于，泛型是声明一个“参数”，而 infer 是声明一个“中间变量”。官方示例。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Unpacked&lt;T&gt; = T <span class="keyword">extends</span> (infer U)[]</span><br><span class="line">  ? U</span><br><span class="line">  : T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>[]) =&gt; infer U</span><br><span class="line">  ? U</span><br><span class="line">  : T <span class="keyword">extends</span> <span class="built_in">Promise</span>&lt;infer U&gt;</span><br><span class="line">  ? U</span><br><span class="line">  : T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> T0 = Unpacked&lt;<span class="built_in">string</span>&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T1 = Unpacked&lt;<span class="built_in">string</span>[]&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T2 = Unpacked&lt;<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">string</span>&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T3 = Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T4 = Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;[]&gt;; <span class="comment">// Promise&lt;string&gt;</span></span><br><span class="line"><span class="keyword">type</span> T5 = Unpacked&lt;Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;[]&gt;&gt;; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<p>typeof 用于获取一个“常量”的类型，这里的“常量”是指任何可以在编译期确定的东西，例如 const、function、class 等。它是从 实际运行代码 通向 类型系统 的单行道。理论上，任何运行时的符号名想要为类型系统所用，都要加上 typeof。但是 class 比较特殊不需要加，因为 ts 的 class 出现得比 js 早，现有的为兼容性解决方案。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> config = &#123; width: <span class="number">2</span>, height: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLength</span>(<span class="params">str: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TConfig = <span class="keyword">typeof</span> config; <span class="comment">// &#123; width: number, height: number &#125;</span></span><br><span class="line"><span class="keyword">type</span> TGetLength = <span class="keyword">typeof</span> getLength; <span class="comment">// (str: string) =&gt; number</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="9-其他杂项"><a href="#9-其他杂项" class="headerlink" title="9. 其他杂项"></a>9. 其他杂项</h3><p>类型转换的语法为 &lt;类型名&gt; xxx 或 xxx as 类型名。推荐始终用 as 语法，因为第一种语法无法在 tsx 文件使用，而且容易和泛型混淆。一般只有这几种场景需要使用类型转换：自动推断不准；TS 报错，想不出更好的类型编写方法，手动抄近路；临时“放飞自我”。<br>在使用类型转换时，应该遵守几个原则：</p>
+<ol>
+<li>若要放松限制，只可放松到能运行的最严格类型上</li>
+<li>如果不知道一个变量的精确类型，只标注到大概类型（例如 any[]）也比 any 好</li>
+<li>任何一段“放飞自我”（完全没有类型覆盖）区代码不应超过 2 行，应在出现第一个可以确定类型的变量时就补上标注</li>
+</ol>
+<p>尽量不使用 enum，它引入了 JavaScript 没有的数据结构（编译成一个双向 map），入侵了运行时，与 TypeScript 宗旨不符。用 string literal union（’small’ | ‘big’ | ‘large’）可以做到相同的事，且在 debug 时可读性更好。如果很在意条件比较的性能，应该用二进制 flag 加位运算。</p>
+<h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ul>
+<li><a href="https://www.tslang.cn/docs/handbook/advanced-types.html" target="_blank" rel="noopener">TypeScript 文档 —— 高级类型</a></li>
+<li><a href="https://juejin.im/user/5d0254a35188254c9f4feaf1" target="_blank" rel="noopener">腾讯 AlloyTeam</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck6z734rf0005ykjfa46r963k" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-清理项目中的无效代码" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" class="article-date">
+  <time datetime="2019-12-18T11:00:55.000Z" itemprop="datePublished">2019-12-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/">清理项目中的无效代码</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>本文不是最佳实践, 而是总结了两种思路。</p>
+<p>随着项目的迭代次数、参与人数的增加，项目的代码和复杂度也都会上升， 正好我 Q4 的工程优化是清理某个部分的无效代码，查阅前人留下的文档时发现可用信息很少，从业务的角度去清理代码不是一种可行的方法， 于是就从项目的本身去思考清除那些没用的代码。</p>
+<h2 id="第一种实现方法"><a href="#第一种实现方法" class="headerlink" title="第一种实现方法"></a>第一种实现方法</h2><p>根据一种比较传统的思路，先是拿到所有的文件列表，然后拿到项目中实际用到的文件 ，对比得出所有其他的文件，然后挨个挨个看是否是要删掉的（考虑到会出现本项目中的文件没有在本项目中使用，但是在其他项目中使用的情况），那么就按照这个思路一步一步做吧。</p>
+<h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p>首先我需要拿到所有文件的清单，直接使用 node 的 fs 跑一下就可以了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">"path"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mkdirPath = <span class="string">"项目的绝对路径"</span>;</span><br><span class="line"><span class="keyword">const</span> filePath = path.resolve(mkdirPath);</span><br><span class="line"></span><br><span class="line">fileDisplay(filePath);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fileDisplay</span>(<span class="params">filePath</span>) </span>&#123;</span><br><span class="line">  fs.readdir(filePath, <span class="function"><span class="keyword">function</span>(<span class="params">err, files</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.warn(err);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      files.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">filename</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> filedir = path.join(filePath, filename);</span><br><span class="line">        fs.stat(filedir, <span class="function"><span class="keyword">function</span>(<span class="params">eror, stats</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (eror) &#123;</span><br><span class="line">            <span class="built_in">console</span>.warn(<span class="string">"获取文件stats失败"</span>);</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> isFile = stats.isFile();</span><br><span class="line">            <span class="keyword">const</span> isDir = stats.isDirectory();</span><br><span class="line">            <span class="keyword">if</span> (isFile) &#123;</span><br><span class="line">              <span class="comment">// ...</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (isDir) &#123;</span><br><span class="line">              fileDisplay(filedir);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者使用一个第三方的 npm 包 glob</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line"><span class="keyword">const</span> glob = <span class="built_in">require</span>(<span class="string">"glob"</span>);</span><br><span class="line"></span><br><span class="line">glob(</span><br><span class="line">  <span class="string">"/Users/tanlg/workspace/mage-client/src/main-app/mobile/**/*"</span>,</span><br><span class="line">  &#123;&#125;,</span><br><span class="line">  <span class="function"><span class="keyword">function</span>(<span class="params">er, files</span>) </span>&#123;</span><br><span class="line">    fs.appendFile(</span><br><span class="line">      <span class="string">"文件列表.txt"</span>,</span><br><span class="line">      <span class="built_in">JSON</span>.stringify(files, <span class="literal">null</span>, <span class="number">2</span>),</span><br><span class="line">      <span class="string">"utf8"</span>,</span><br><span class="line">      <span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (error) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"写入成功"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>这样就拿到了所有文件的列表了。就像这样：</p>
+<p><img src="/image/WX20191218-192617@2x.png" alt="eg"></p>
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>需要获取到实际用到的文件列表，因为我们的项目都是单页应用，每一个打包的单元会有一个 entry，这样我们可以使用 webpack 获取到从入口开始分析的所有依赖 tree。这样就拿到所有的实际使用的文件了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'client-compile'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  webpack(<span class="built_in">require</span>(<span class="string">'./webpack.dev.config'</span>), <span class="function"><span class="keyword">function</span>(<span class="params">err, stats</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> statsConfig = &#123;&#125; <span class="comment">// stats 的自定义配置</span></span><br><span class="line">    <span class="comment">// edit stats.toJSON(statsConfig)</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>或者使用一个 babel 插件 webpack-bundle-analyzer, 具体使用方法可以参照<br><a href="https://www.npmjs.com/package/webpack-bundle-analyzer" target="_blank" rel="noopener">webpack-bundle-analyzer</a></p>
+<h3 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h3><p>有了两份文件，我们根据对比就能找出实际无用的代码文件了，然后再根据业务上的需要筛选出要删除的文件。</p>
+<h2 id="第二种实现方法"><a href="#第二种实现方法" class="headerlink" title="第二种实现方法"></a>第二种实现方法</h2><p>第二种方法是可以写一个 webpack 插件来实现静态资源分析。</p>
+<p>首先要明确 webpack 大体上的流程，分别是：</p>
+<ol>
+<li>处理 options</li>
+<li>设置 plugin</li>
+<li>处理 module（递归解析依赖）</li>
+<li>生成 bundle</li>
+</ol>
+<p>由于只需要进行分析依赖，所以执行完第三步的时候我们直接终止 webpack 的后续流程，不再进行生成 chunk 以及对 chunk 做的合并优化等过程，这样就可以节省很大一部分时间。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pluginName = <span class="string">"FastDependenciesAnalyzerPlugin"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">FastDependenciesAnalyzerPlugin</span> </span>&#123;</span><br><span class="line">  beforeResolve(resolveData, callback) &#123;&#125;</span><br><span class="line"></span><br><span class="line">  afterResolve(result, callback) &#123;&#125;</span><br><span class="line"></span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    compiler.hooks.normalModuleFactory.tap(pluginName, nmf =&gt; &#123;</span><br><span class="line">      nmf.hooks.beforeResolve.tapAsync(pluginName, <span class="keyword">this</span>.beforeResolve);</span><br><span class="line">      nmf.hooks.afterResolve.tapAsync(pluginName, <span class="keyword">this</span>.afterResolve);</span><br><span class="line">    &#125;);</span><br><span class="line">    compiler.hooks.compilation.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">      compilation.hooks.finishModules.tapAsync(</span><br><span class="line">        pluginName,</span><br><span class="line">        <span class="keyword">this</span>.handleFinishModules</span><br><span class="line">      );</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要监听两个地方：</p>
+<ul>
+<li>在 complier.hooks.normalModuleFactory 这个 hook 的回调中继续监听 normalModuleFactory 的 beforeResolve hook 和 beforeResolve hook。</li>
+<li>在 complier.hooks.compilation 这个 hooks 的回调中继续监听 compilation 的 finishModules hook。</li>
+</ul>
+<p>然后继续进行改造</p>
+<h3 id="beforeResolve"><a href="#beforeResolve" class="headerlink" title="beforeResolve"></a>beforeResolve</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">beforeResolve(resolveData, callback) &#123;</span><br><span class="line">   <span class="keyword">const</span> &#123; context, contextInfo, request &#125; = resolveData;</span><br><span class="line">   <span class="keyword">const</span> &#123; issuer &#125; = contextInfo;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">return</span> (</span><br><span class="line">     ignoreDependenciesArr.some(<span class="function"><span class="params">item</span> =&gt;</span> request.includes(item)) ||</span><br><span class="line">     issuer.includes(<span class="string">"node_modules"</span>)</span><br><span class="line">   );</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>context 表示为 解析目录的绝对路径，一个页面的 context 都是一样的， issuer 在 webpack 中表示本模块被依赖的对象路径，也就指向这个模块的来源，request 表示当前模块的的请求路径。<br>比如：banner.js 的资源路径为：/xx/xxx/banner.js ，<br>文件内容是这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"./utils"</span>;</span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"@utils"</span>;</span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"utils"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>所以对于 utils 模块来说， issuer 的值为 /xx/xxx/banner.js， request 的值分别为 “./utils.js”、”@utils”、”utils” 。<br>此时，我们只能知道当前模块的来源路径 issuer 以及它被请求的路径 request，拿不到当前模块的真实路径，还无法将它放入我们的依赖树中，所以我们不会在 beforeReslove 中处理我们的依赖树，我们在这一步中只是想屏蔽掉一些我们不想被处理的模块就可以，比如假设 utils 这个 npm 包里有非常多的小模块，这些模块不会被放到依赖树中，所以对于这些模块我们选择直接跳过。<br>对于在 beforeResolve 中没有返回值的模块会直接 callback ，在 webpack 源码中 callback 里如果没有参数，往往意味着流程的提前结束，在 beforeResolve 中 return callback 也就没有这个模块后续对 reslove 和 build 流程了，这就实现了模块跳过。</p>
+<h3 id="afterResolve"><a href="#afterResolve" class="headerlink" title="afterResolve"></a>afterResolve</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">afterResolve(result, callback) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; resourceResolveData &#125; = result;</span><br><span class="line">  <span class="keyword">const</span> &#123;</span><br><span class="line">    context:&#123;</span><br><span class="line">      issuer</span><br><span class="line">      &#125;,</span><br><span class="line">    path</span><br><span class="line">  &#125; = resourceResolveData;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里添加依赖到依赖树</span></span><br></pre></td></tr></table></figure>
+
+<p>webpack 使用 <a href="https://www.npmjs.com/package/enhanced-resolve" target="_blank" rel="noopener">enhanced-resolve</a> 对一个请求路径作解析，只需要传入模块的 contextInfo, context,<br>request, 即可拿到当前模块的真实路径，当然前提是需要告知 enhanced-resolve ，这个模块所在 repo 的 package.json， webpack 配置中的 alias 信息等等。<br>总之，在 afterReslove 中我们能够拿到 webpack 借用 enhanced-resolve 解析过后的模块路径了，还有依赖这个模块的父模块路径，将这两个路径添加到依赖树中，经过简单的递归操作就可以拿到完整的依赖树了，当然在依赖树中我们可以放置各种信息，比如是否是一个模块？是否是一个 js 文件、是否是一个 css 文件，这些都可以实现。</p>
+<h3 id="一些坑"><a href="#一些坑" class="headerlink" title="一些坑"></a>一些坑</h3><ol>
+<li><p>对于在 js 中引用的 css 或者 scss 文件，可以通过寻常的 reslove 流程拿到依赖，但是如果在 css 中使用了 @import 语法，由于 css-loader 会自行处理这些语法，所以它不会走 webpack 本身的 reslove 流程，详见<a href="https://github.com/webpack-contrib/css-loader/issues/755" target="_blank" rel="noopener">issue</a>，这里得我们自己在 beforeReslove 中对这部分做额外对处理，比如通过字符串截取的方式去掉 request 中关于 loder 描述的部分，再通过主动调用 enhance-resolve 这个方法实现对 @import 传进来对模块做处理，最终拿到正确的路径。</p>
+</li>
+<li><p>不同版本的 webpack 一些 hook 的用法和名称会不一样，开发者在处理内部流程的时候要注意。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck6z734re0004ykjf4h1v7kvn" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-避免面向监狱编程" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" class="article-date">
+  <time datetime="2019-11-20T12:43:10.000Z" itemprop="datePublished">2019-11-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/">避免面向监狱编程</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>网络并非法外之地，有些时候作为一名开发者，也要搞清楚哪些是可以做的，哪些是不能做的，加强自身安全意识，避免进局子。</p>
+<p>程序员能接触的几个比较危险的几个领域分别是：爬虫、外挂、p2p、赌博、se情等，下面就列举一下。</p>
+<h2 id="爬虫"><a href="#爬虫" class="headerlink" title="爬虫"></a>爬虫</h2><p>爬虫，是互联网时代一项普遍运用的网络信息搜集技术。该项技术最早应用于搜索引擎领域，是搜索引擎获取数据来源的支撑性技术之一。</p>
+<p>随着数据资源的爆炸式增长，网络爬虫的应用场景和商业模式变得更加广泛和多样，较为常见的有新闻平台的内容汇聚和生成、电子商务平台的价格对比功能、基于气象数据的天气预报应用等等。</p>
+<p>网络爬虫技术为数据收集者提供了极大的便利，也给专业网络爬虫公司带来巨大的收益。所以，很多公司都会有爬虫部门，或者负责开发爬虫的团队，在招聘网站上，也随处可见关于”爬虫工程师”的招聘贴。</p>
+<p><img src="/image/WX20191121-205016.png" alt="来自某直聘的信息"></p>
+<p>目前，关于网络爬虫相关的约束，主要是2019年05月28日国家网信办发布的《数据安全管理办法（征求意见稿）》。这份文件主要包含了数据收集、数据处理使用以及数据安全监督管理三个章节。</p>
+<p>​基本可以确定的是，如果爬虫使用不当，那么爬虫的开发者是有可能触犯法律的，而根据情况不同，获得的刑罚也有可能有差异。</p>
+<p>要看开发和使用爬虫是否犯法，需要从爬什么数据、如何爬取数据以及爬到数据之后怎么用三个方面来判断：</p>
+<h3 id="属于著作权法保护的作品"><a href="#属于著作权法保护的作品" class="headerlink" title="属于著作权法保护的作品"></a>属于著作权法保护的作品</h3><blockquote>
+<p>根据《中华人民共和国著作权法》第46条：有下列侵权行为的，应当根据情况，承担停止侵害、消除影响、公开赔礼道歉、赔偿损失等民事责任，并可以由著作权行政管理部门给予没收非法所得、罚款等行政处罚：<br>    （一）剽窃、抄袭他人作品的；<br>    （二）未经著作权人许可，以营利为目的，复制发行其作品的；<br>    （三）出版他人享有专有出版权的图书的；<br>    （四）未经表演者许可，对其表演制作录音录像出版的；<br>    （五）未经录音录像制作者许可，复制发行其制作的录音录像的；<br>    （六）未经广播电台、电视台许可，复制发行其制作的广播、电视节目的；<br>    （七）制作、出售假冒他人署名的美术作品的。</p>
+</blockquote>
+<p>所以，如果是使用爬虫技术手段爬取数据之后将其保存下来或者传播，并且进行盈利，这种都是属于犯罪的。</p>
+<h3 id="用户的个人信息或者个人隐私"><a href="#用户的个人信息或者个人隐私" class="headerlink" title="用户的个人信息或者个人隐私"></a>用户的个人信息或者个人隐私</h3><blockquote>
+<p>根据《民法总则》第111条：任何组织和个人需要获取他人个人信息的，应当依法取得并确保信息安全。不得非法收集、使用、加工、传输他人个人信息；<br>  根据《网络安全法》第44条：任何个人和组织不得窃取或者以其他非法方式获取个人信息。因此，如果爬虫在未经用户同意的情况下大量抓取用户的个人信息，则有可能构成非法收集个人信息的违法行为。</p>
+</blockquote>
+<p>所以，如果爬取的数据涉及到个人信息，都是违法的。</p>
+<h3 id="反不正当竞争保护的数据"><a href="#反不正当竞争保护的数据" class="headerlink" title="反不正当竞争保护的数据"></a>反不正当竞争保护的数据</h3><blockquote>
+<p>根据《反不正当竞争法》第2条：经营者在市场交易中，应当遵循自愿、平等、公平、诚实信用的原则，遵守公认的商业道德。</p>
+</blockquote>
+<p>在大众点评诉百度不正当竞争案件、以及新浪微博诉脉脉不正当竞争等案件中，法院都认定被告未经许可抓取、使用原告网站中的数据的行为，违反了诚实信用原则及公认的道德，损害了互联网的市场竞争秩序，损害了原告的竞争优势，从而构成不正当竞争。</p>
+<p>因此，如果抓取大众点评、微博、豆瓣电影、知乎等UGC模式的网站上用户发布的信息，并在自己的产品或者服务中发布、使用该等信息，则有较大的风险构成不正当竞争。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在使用爬虫的过程中，爬取的数据类型、爬取数据的方式以及爬取之后的使用都是可能触犯法律的。</p>
+<p>其中，使用爬虫得到的数据进行盈利、损害他人利益、不正当竞争等一般都是针对经营者的。</p>
+<p>但是对于程序员来说，如果你的老板让你开发的爬虫，是用来爬取用户的个人信息或者个人隐私，并且该爬虫未遵循Robots协议、并且有意的躲避反爬机制就可能触犯到法律了。</p>
+<h2 id="赌博"><a href="#赌博" class="headerlink" title="赌博"></a>赌博</h2><p>根据《最高人民法院、最高人民检察院、公安部关于办理网络赌博犯罪案件适用法律若干问题的意见》中关于网上开设赌场共同犯罪的认定和处罚规定</p>
+<blockquote>
+<p>明知是赌博网站,而为其提供下列服务或者帮助的,属于开设赌场罪的共同犯罪,依照刑法第三百零三条第二款的规定处罚:<br>    (一)为赌博网站提供互联网接入、服务器托管、网络存储空间、通讯传输通道、投放广告、发展会员、软件开发、技术支持等服务,收取服务费数额在2万元以上的;<br>    (二)为赌博网站提供资金支付结算服务,收取服务费数额在1万元以上或者帮助收取赌资20万元以上的;<br>    (三)为10个以上赌博网站投放与网址、赔率等信息有关的广告或者为赌博网站投放广告累计100条以上的。</p>
+</blockquote>
+<p>也就是说，如果你作为程序员，你在帮公司开发赌博网站，只要公司付给你的费用超过了2万元以上，那么你就和开设赌场的人是共同犯罪。</p>
+<p><img src="/image/WX20191121-210037.png" alt="律师的解答"></p>
+<p>所以，程序员一定要远离赌博网站，并拒绝为他们提供技术服务。</p>
+<h2 id="se-情"><a href="#se-情" class="headerlink" title="se 情"></a>se 情</h2><p>这个同上， 黄赌毒都不要碰。</p>
+<h2 id="P2P"><a href="#P2P" class="headerlink" title="P2P"></a>P2P</h2><p><img src="/image/ee41b05b63564999ac2c1ceb1ac1b8ff.jpeg" alt=" "></p>
+<p><img src="/image/6b55cb28063d4021a78f27836c685451.jpeg" alt=" "></p>
+<p>那么，关于这个情况，知乎上有用户给过专业的解答：<br>『如果程序员只是单纯的负责开发，只拿合理的死工资，本人对于公司的合法性和P2P的政策不了解，找工作也是通过正规渠道的。』那么就不算从犯。</p>
+<p>但是，如果还负责了公司的其他事情，或者没有只拿死工资，找工作也不是正规渠道的，那就另当别论了。重要的是，如果自己明知道公司是非法的，那么肯定就涉及犯罪了。</p>
+<p>所以，对于这种做互联网金融的企业的程序员，需要多多了解一下自己公司当前的主营业务是否合法。是否涉及到非法集资、传销等违法行为。</p>
+<p><img src="/image/4e8404224ddf4fe39743e00547461e24.jpeg" alt=" "></p>
+<h2 id="外挂"><a href="#外挂" class="headerlink" title="外挂"></a>外挂</h2><p>外挂等违法行为的出现，严重侵害了游戏开发者、运营商以及正常消费者的合法权益，扰乱了互联网游戏经营的正常秩序，破坏了网络游戏产业的良性发展，违反国家规定，情节严重，应按刑法第225条第四项的规定处罚。</p>
+<blockquote>
+<p>根据《刑法》第225条：违反国家规定，有下列非法经营行为之一，扰乱市场秩序，情节严重的，处五年以下有期徒刑或者拘役，并处或者单处违法所得一倍以上五倍以下罚金;情节特别严重的，处五年以上有期徒刑，并处违法所得一倍以上五倍以下罚金或者没收财产：<br>    (一)未经许可经营法律、行政法规规定的专营、专卖物品或者其他限制买卖的物品的;<br>    (二)买卖进出口许可证、进出口原产地证明以及其他法律、行政法规规定的经营许可证或者批准文件的;<br>    (三)未经国家有关主管部门批准非法经营证券、期货、保险业务的，或者非法从事资金支付结算业务的;<br>    (四)其他严重扰乱市场秩序的非法经营行为。</p>
+</blockquote>
+<h2 id="最后总结"><a href="#最后总结" class="headerlink" title="最后总结"></a>最后总结</h2><p>对于广大爬虫工程师，如果你开发的爬虫涉及个人信息及隐私，爬虫未遵守Robots协议，爬虫企图通过技术手段绕过反爬机制等，都是触犯了法律的。</p>
+<p>对于那些做爬虫的企业，如果涉及到爬取受著作权保护的内容，涉及到公司商业机密等内容，并且用于盈利或者不正当竞争等，也是国家法律所不允许的。<br>还有就是，”明知故犯”的事情不要做，也不要抱有任何侥幸心理，一定要远离赌博、​S情网站，并拒绝为他们提供任何技术支持。</p>
+<p>如果公司的主营业务室P2P，并且自己参与了P2P的开发，那么一定要了解清楚自己公司所做的业务是否合规，如果发现不合规，一定要趁早离职。并且不要参与除​纯开发以外的其他事宜。</p>
+<p>不要参与’外挂软件’的开发。学会保护自己！</p>
+<p>如果你是文中介绍过的相关行业中的程序员，那么希望大家第一时间找律师咨询一下，自己是否有触及到法律，以及如何避免和脱身等。</p>
+<p>本文只是简单介绍了几种常见的容易被坑的情况，还有很多情况正在发生和即将发生，所以，希望广大程序员们，不要只顾埋头写代码，还要经常抬头看看，审视下自己所做的产品、所在的公司以及所从事的行业。</p>
+<p>作为程序员，我们手里的技术就是工具，那么，我们有责任也有义务来保证我们的工具是用在正途的。</p>
+<p>最后，技术无罪、人会犯错、知错能改、善莫大焉。</p>
+<p>参考资料：</p>
+<p><a href="https://time.geekbang.org/column/article/42208" target="_blank" rel="noopener">https://time.geekbang.org/column/article/42208</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck6z734ri0008ykjf14f51nlc" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-开发过程中webpack内存溢出问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2019-10-24T10:55:21.000Z" itemprop="datePublished">2019-10-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/">开发过程中webpack内存溢出问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>mage项目比较大，启动起来保存几下就崩溃了，如图：<br><img src="/image/20191024185854.jpg" alt="mage崩溃图"><br>google查阅相关资料，整个插件分析一下 webpack-bundle-analyzer</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; BundleAnalyzerPlugin &#125; = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> BundleAnalyzerPlugin()</span><br></pre></td></tr></table></figure>
+<p>启动后发现，嚯，这么大。怪不得妹纸崩溃了。<br><img src="/image/20191024190619.jpg" alt="mage崩溃原因图"></p>
+<p>分析一下原因：</p>
+<ol>
+<li>项目本身太大了，开发过程中把所有入口的项目都打包了（hr pc端、hr移动端、 hm pc端、hm移动端等等）。</li>
+<li>使用的其他仓库的东西没有做按需加载（比如 moka UI）<br><img src="/image/20191024192752.jpg" alt="开发环境打包的js每个都含有 1M+ 大小的moka UI"></li>
+<li>三方库用的太多，挖掘机炒菜。（猜测很多库只用到了很小到一部分功能，对应的功能完全可以手动实现？）</li>
+</ol>
+<p>展望一下未来的优化思路以及解决方法：</p>
+<ol>
+<li>爷有钱，加内存！<br><img src="/image/20191024193632.jpg" alt="炫富"><br>4096不行，整上40960<br>很捞的方法，也是我正在使用的方法，优点是省事，缺点是除了省事没别的了，作为一位程序员还是要有不断优化项目的觉悟。</li>
+<li>曾经用过的一个方法，webpack按照路由编译，<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">entry: &#123;</span><br><span class="line">  app: [</span><br><span class="line">    <span class="built_in">require</span>.resolve(<span class="string">'./polyfills'</span>),</span><br><span class="line">    <span class="string">'react-hot-loader/patch'</span>,</span><br><span class="line">    config.startRoutes ? paths.appDevIndexJs : paths.appIndexJs</span><br><span class="line">  ]</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+具体思路是两个参数(根目录整个config.js配置一下)，一个用来控制是否按路由启动， 第二个参数是传入的路由文件（组件），这样就把需要调试的地方渲染出来了，很快。（缺点是对路由文件的管理比较严格，改一改应该可以应用到mage项目里）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  port: <span class="number">3000</span>,</span><br><span class="line">  proxy: &#123;</span><br><span class="line">    <span class="string">'/p'</span>: <span class="string">'http://test.mokahr.com'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;&#125;,</span><br><span class="line">  publicPath: <span class="string">'/'</span>,</span><br><span class="line">  eslint: <span class="literal">true</span>,</span><br><span class="line">  bundleAnalyzer: <span class="literal">false</span>,</span><br><span class="line">  autoOpenUrl: <span class="function"><span class="params">port</span> =&gt;</span> <span class="string">`http://test.mokahr.com:<span class="subst">$&#123;port&#125;</span>`</span>,</span><br><span class="line">  startRoutes: <span class="literal">false</span>,</span><br><span class="line">  routePath: <span class="string">'xxxxxx'</span></span><br><span class="line">  useTs: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>把不同的入口拆成不同的仓库，这样就能单独维护某一个端了。</li>
+<li>新的suger design 已经做按需加载了，很棒，应该就跟antd design + babel-plugin-import 的效果一样 引入对应的文件。</li>
+<li>网上找了个方法，还没来得及看，先放这儿了<br>使用webbpack-dev-serve钩子进行单独编译：在webpack-dev-serve中，有一个钩子before，在访问页面的时候我们能够拿到页面信息的路径，下面是实现<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vue.config.js</span></span><br><span class="line"><span class="keyword">const</span> compiledPages = [];</span><br><span class="line">before(app) &#123;</span><br><span class="line">      app.get(<span class="string">'*.html'</span>, (req, res, next) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> result = req.url.match(<span class="regexp">/[^/]+?(?=\.)/</span>);</span><br><span class="line">        <span class="keyword">const</span> pageName = result &amp;&amp; result[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">const</span> pagesName = <span class="built_in">Object</span>.keys(multiPageConfig);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pageName) &#123;</span><br><span class="line">          <span class="keyword">if</span> (pagesName.includes(pageName)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!compiledPages.includes(pageName)) &#123;</span><br><span class="line">              <span class="keyword">const</span> page = multiPageConfig[pageName];</span><br><span class="line">              fs.writeFileSync(<span class="string">`dev-entries/<span class="subst">$&#123;pageName&#125;</span>.js`</span>, <span class="string">`import '../<span class="subst">$&#123;page.tempEntry&#125;</span>'; // eslint-disable-line`</span>);</span><br><span class="line">              compiledPages.push(pageName);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 没这个入口</span></span><br><span class="line">            res.writeHead(<span class="number">200</span>, &#123; <span class="string">'content-type'</span>: <span class="string">'text/html; charset=utf-8'</span> &#125;);</span><br><span class="line">            res.end(<span class="string">'&lt;p style="font-size: 50px;"&gt;不存在的入口&lt;/p&gt;'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        next();</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line"><span class="keyword">const</span> util = <span class="built_in">require</span>(<span class="string">'util'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = util.promisify(fs.writeFile);</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> tasks = [];</span><br><span class="line">  <span class="keyword">if</span> (!fs.existsSync(<span class="string">'dev-entries'</span>)) &#123;</span><br><span class="line">    fs.mkdirSync(<span class="string">'dev-entries'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">Object</span>.keys(pages).forEach(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> entry = <span class="string">`dev-entries/<span class="subst">$&#123;key&#125;</span>.js`</span>;</span><br><span class="line">    pages[key].tempEntry = pages[key].entry; <span class="comment">// 暂存真正的入口文件地址</span></span><br><span class="line">    pages[key].entry = entry;</span><br><span class="line">    tasks.push(outputFile(entry, <span class="string">''</span>));</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">await</span> <span class="built_in">Promise</span>.all(tasks);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (process.env.NODE_ENV === <span class="string">'development'</span>) &#123;</span><br><span class="line">  main();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = pages;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck6z734ra0001ykjfe6re3fmy" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+    <article id="post-TypeScript封装的一个fetch包" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" class="article-date">
+  <time datetime="2019-08-30T13:06:19.000Z" itemprop="datePublished">2019-08-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/">TypeScript封装的一个fetch包</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="自己封了个-fetch-，总结一下几个关键点"><a href="#自己封了个-fetch-，总结一下几个关键点" class="headerlink" title="自己封了个 fetch ，总结一下几个关键点"></a>自己封了个 fetch ，总结一下几个关键点</h1><h2 id="1-定义好要用的interface"><a href="#1-定义好要用的interface" class="headerlink" title="1. 定义好要用的interface"></a>1. 定义好要用的interface</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Omit &#125; <span class="keyword">from</span> <span class="string">'./util'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">enum</span> EMethod &#123;</span><br><span class="line">  Get = <span class="string">'GET'</span>,</span><br><span class="line">  Post = <span class="string">'POST'</span>,</span><br><span class="line">  Put = <span class="string">'PUT'</span>,</span><br><span class="line">  Delete = <span class="string">'DELETE'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchResponse &#123;</span><br><span class="line">  data: <span class="built_in">any</span></span><br><span class="line">  msg: <span class="built_in">string</span></span><br><span class="line">  success: <span class="built_in">boolean</span></span><br><span class="line">  RetCode: <span class="built_in">number</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchConfig <span class="keyword">extends</span> Omit&lt;RequestInit, 'body'&gt; &#123;</span><br><span class="line">  method?: <span class="string">'GET'</span> | <span class="string">'POST'</span> | <span class="string">'PUT'</span> | <span class="string">'DELETE'</span></span><br><span class="line">  body?: object</span><br><span class="line">  dataType?: <span class="string">'hlj'</span> | <span class="string">'json'</span> | <span class="string">'text'</span></span><br><span class="line">  bodyType?: <span class="string">'json'</span> | <span class="string">'file'</span></span><br><span class="line">  codeKey?: <span class="built_in">string</span></span><br><span class="line">  ignore?: <span class="built_in">any</span>[]</span><br><span class="line">  onError?: <span class="function">(<span class="params">(<span class="params">RetCode, msg</span>) =&gt; <span class="built_in">void</span></span>) | <span class="params">null</span> | <span class="params">false</span></span></span><br><span class="line"><span class="function">  <span class="params">expect</span>?: <span class="params">any</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>请求的方法、返回的格式、请求体的格式、都定义好按照这个来，有一点是原生的RequestInit的body是必传的，根据我的需求body可以不传，所以omit掉了。（注： 最新的ts好像内置omit方法）附omit方法：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Omit&lt;T, K&gt; = Pick&lt;T, Exclude&lt;keyof T, K&gt;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-参数的处理"><a href="#2-参数的处理" class="headerlink" title="2.参数的处理"></a>2.参数的处理</h2><p>原本的参数是一个对象的形式，get、delete请求方法时候要把对象转化成字符串拼接到url上</p>
+<h2 id="3-文件的处理"><a href="#3-文件的处理" class="headerlink" title="3.文件的处理"></a>3.文件的处理</h2><p>为了满足上传文件的需要，定义了一个 ‘file’ 类型的请求方式用于上传文件,使用FormData实现</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 上传文件</span></span><br><span class="line"><span class="keyword">if</span> (bodyType === <span class="string">'file'</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">new</span> FormData()</span><br><span class="line">  <span class="built_in">Object</span>.keys(body).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    data.append(key, body[key])</span><br><span class="line">  &#125;)</span><br><span class="line">  requestInit.body = data</span><br><span class="line">  <span class="keyword">delete</span> requestInit.headers[<span class="string">'Content-Type'</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-fetch可配置化"><a href="#4-fetch可配置化" class="headerlink" title="4. fetch可配置化"></a>4. fetch可配置化</h2><p>每个项目中可能有不同的配置，比如自定义的统一错误提示、自定义的header</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> configure = <span class="function">(<span class="params">&#123; config, ...rest &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (isFunction(config)) &#123;</span><br><span class="line">    globalConfig = config(globalConfig)</span><br><span class="line">  &#125;</span><br><span class="line">  globalConfig = &#123; ...globalConfig, ...rest &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本地项目中可以调用configure方法 把自己自定义的配置merge上去。</p>
+<h2 id="5-写测试"><a href="#5-写测试" class="headerlink" title="5.写测试"></a>5.写测试</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">"dependencies": &#123;</span><br><span class="line">    "@babel/core": "^7.4.5",</span><br><span class="line">    "@babel/preset-env": "^7.4.5",</span><br><span class="line">    "@babel/preset-typescript": "^7.3.3",</span><br><span class="line">    "@ryzen/eslint-config-ryzen": "^1.0.9",</span><br><span class="line">    "@types/jest": "^24.0.13",</span><br><span class="line">    "babel-jest": "^24.8.0",</span><br><span class="line">    "eslint": "4.19.1",</span><br><span class="line">    "global": "^4.3.2",</span><br><span class="line">    "jest": "^24.8.0",</span><br><span class="line">    "microbundle": "^0.11.0"</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> http, &#123; createApi &#125; <span class="keyword">from</span> <span class="string">'../src'</span></span><br><span class="line"></span><br><span class="line">test(<span class="string">'http, createApi, should have 4 method, get, post, post, delete'</span>, () =&gt; &#123;</span><br><span class="line">  ;[http, createApi].forEach(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'post'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'get'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'delete'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'put'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="/image/20191007202531.jpg" alt=""><br>对每一个必要的模块加上单元测试，这样再次迭代之后跑一下jest就不怕改坏了。</p>
+<h2 id="6-使用lerna进行多包管理"><a href="#6-使用lerna进行多包管理" class="headerlink" title="6.使用lerna进行多包管理"></a>6.使用lerna进行多包管理</h2><p>因为这个包依赖了其他自己写的包（eslint-config包）并且使用lerna可以方便的管理package之间的依赖、一键发布、打changelog等 </p>
+<p><img src="/image/20191007203309.jpg" alt=""><br><img src="/image/20191007203431.jpg" alt="lerna的多包管理"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck6z734r70000ykjf20zth8ua" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+     
+        <h3 class="follow-title ">Follow me</h3>
+     
+    <div class="widget follow">
+      
+              <a class="github" aria-hidden="true" href="https://github.com/giscafer" target="_blank" title="Github"></a>
+      
+      
+            <a class="weibo" aria-hidden="true"  href="http://weibo.com/laohoubin" target="_blank" title="微博"></a>
+      
+      
+              <a class="zhihu" aria-hidden="true"  href="http://www.zhihu.com/people/giscafer" target="_blank" title="知乎"></a>
+      
+      
+            <a class="email" aria-hidden="true"  href="mailto:youemail@outlook.com" target="_blank" title="邮箱"></a>
+      
+    </div>
+  </div>
+
+
+  
+    
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title tagcloud">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/JavaScript/" style="font-size: 14px;">JavaScript</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title recent-posts">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/">TypeScript————类型相关总结</a>
+          </li>
+        
+          <li>
+            <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/">清理项目中的无效代码</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/">避免面向监狱编程</a>
+          </li>
+        
+          <li>
+            <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/">开发过程中webpack内存溢出问题</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title archive">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+<div class="widget-wrap">
+    <h3 class="widget-title">Links</h3>
+    <div class="widget">
+        <ul>
+            
+            <li>
+                <a href="http://blog.giscafer.com" target="_blank" rel="noopener">giscafer&#39;s blog</a>
+            </li>
+            
+            <li>
+                <a href="http://www.gis520.com" target="_blank" rel="noopener">GIS520社区</a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+
+  
+    <!--微信公众号二维码-->
+
+  <div class="widget-wrap">
+    <h3 class="follow-title ">WeChat</h3>
+    <div class="widget wechat-widget">
+        <img src="http://blog.giscafer.com/static/images/qrcode_giscafer.jpg" alt="扫码关注" width="250"/>
+    </div>
+  </div>
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2020 x1eJian&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;youemail@outlook.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

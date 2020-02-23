@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>清理项目中的无效代码 | x1eJian&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文不是最佳实践, 而是总结了两种思路。 随着项目的迭代次数、参与人数的增加，项目的代码和复杂度也都会上升， 正好我 Q4 的工程优化是清理某个部分的无效代码，查阅前人留下的文档时发现可用信息很少，从业务的角度去清理代码不是一种可行的方法， 于是就从项目的本身去思考清除那些没用的代码。 第一种实现方法根据一种比较传统的思路，先是拿到所有的文件列表，然后拿到项目中实际用到的文件 ，对比得出所有其他的">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="清理项目中的无效代码">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;18&#x2F;%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81&#x2F;index.html">
+<meta property="og:site_name" content="x1eJian&#39;s blog">
+<meta property="og:description" content="本文不是最佳实践, 而是总结了两种思路。 随着项目的迭代次数、参与人数的增加，项目的代码和复杂度也都会上升， 正好我 Q4 的工程优化是清理某个部分的无效代码，查阅前人留下的文档时发现可用信息很少，从业务的角度去清理代码不是一种可行的方法， 于是就从项目的本身去思考清除那些没用的代码。 第一种实现方法根据一种比较传统的思路，先是拿到所有的文件列表，然后拿到项目中实际用到的文件 ，对比得出所有其他的">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;WX20191218-192617@2x.png">
+<meta property="og:updated_time" content="2020-02-23T14:42:41.199Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;WX20191218-192617@2x.png">
+  
+    <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">x1eJian&#39;s blog</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-清理项目中的无效代码" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" class="article-date">
+  <time datetime="2019-12-18T11:00:55.000Z" itemprop="datePublished">2019-12-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      清理项目中的无效代码
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>本文不是最佳实践, 而是总结了两种思路。</p>
+<p>随着项目的迭代次数、参与人数的增加，项目的代码和复杂度也都会上升， 正好我 Q4 的工程优化是清理某个部分的无效代码，查阅前人留下的文档时发现可用信息很少，从业务的角度去清理代码不是一种可行的方法， 于是就从项目的本身去思考清除那些没用的代码。</p>
+<h2 id="第一种实现方法"><a href="#第一种实现方法" class="headerlink" title="第一种实现方法"></a>第一种实现方法</h2><p>根据一种比较传统的思路，先是拿到所有的文件列表，然后拿到项目中实际用到的文件 ，对比得出所有其他的文件，然后挨个挨个看是否是要删掉的（考虑到会出现本项目中的文件没有在本项目中使用，但是在其他项目中使用的情况），那么就按照这个思路一步一步做吧。</p>
+<h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p>首先我需要拿到所有文件的清单，直接使用 node 的 fs 跑一下就可以了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">"path"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> mkdirPath = <span class="string">"项目的绝对路径"</span>;</span><br><span class="line"><span class="keyword">const</span> filePath = path.resolve(mkdirPath);</span><br><span class="line"></span><br><span class="line">fileDisplay(filePath);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">fileDisplay</span>(<span class="params">filePath</span>) </span>&#123;</span><br><span class="line">  fs.readdir(filePath, <span class="function"><span class="keyword">function</span>(<span class="params">err, files</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.warn(err);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      files.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">filename</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">const</span> filedir = path.join(filePath, filename);</span><br><span class="line">        fs.stat(filedir, <span class="function"><span class="keyword">function</span>(<span class="params">eror, stats</span>) </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> (eror) &#123;</span><br><span class="line">            <span class="built_in">console</span>.warn(<span class="string">"获取文件stats失败"</span>);</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> isFile = stats.isFile();</span><br><span class="line">            <span class="keyword">const</span> isDir = stats.isDirectory();</span><br><span class="line">            <span class="keyword">if</span> (isFile) &#123;</span><br><span class="line">              <span class="comment">// ...</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (isDir) &#123;</span><br><span class="line">              fileDisplay(filedir);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者使用一个第三方的 npm 包 glob</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line"><span class="keyword">const</span> glob = <span class="built_in">require</span>(<span class="string">"glob"</span>);</span><br><span class="line"></span><br><span class="line">glob(</span><br><span class="line">  <span class="string">"/Users/tanlg/workspace/mage-client/src/main-app/mobile/**/*"</span>,</span><br><span class="line">  &#123;&#125;,</span><br><span class="line">  <span class="function"><span class="keyword">function</span>(<span class="params">er, files</span>) </span>&#123;</span><br><span class="line">    fs.appendFile(</span><br><span class="line">      <span class="string">"文件列表.txt"</span>,</span><br><span class="line">      <span class="built_in">JSON</span>.stringify(files, <span class="literal">null</span>, <span class="number">2</span>),</span><br><span class="line">      <span class="string">"utf8"</span>,</span><br><span class="line">      <span class="function"><span class="keyword">function</span>(<span class="params">error</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (error) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"写入成功"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>这样就拿到了所有文件的列表了。就像这样：</p>
+<p><img src="/image/WX20191218-192617@2x.png" alt="eg"></p>
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>需要获取到实际用到的文件列表，因为我们的项目都是单页应用，每一个打包的单元会有一个 entry，这样我们可以使用 webpack 获取到从入口开始分析的所有依赖 tree。这样就拿到所有的实际使用的文件了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">gulp.task(<span class="string">'client-compile'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">  webpack(<span class="built_in">require</span>(<span class="string">'./webpack.dev.config'</span>), <span class="function"><span class="keyword">function</span>(<span class="params">err, stats</span>) </span>&#123;</span><br><span class="line">      <span class="keyword">const</span> statsConfig = &#123;&#125; <span class="comment">// stats 的自定义配置</span></span><br><span class="line">    <span class="comment">// edit stats.toJSON(statsConfig)</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>或者使用一个 babel 插件 webpack-bundle-analyzer, 具体使用方法可以参照<br><a href="https://www.npmjs.com/package/webpack-bundle-analyzer" target="_blank" rel="noopener">webpack-bundle-analyzer</a></p>
+<h3 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h3><p>有了两份文件，我们根据对比就能找出实际无用的代码文件了，然后再根据业务上的需要筛选出要删除的文件。</p>
+<h2 id="第二种实现方法"><a href="#第二种实现方法" class="headerlink" title="第二种实现方法"></a>第二种实现方法</h2><p>第二种方法是可以写一个 webpack 插件来实现静态资源分析。</p>
+<p>首先要明确 webpack 大体上的流程，分别是：</p>
+<ol>
+<li>处理 options</li>
+<li>设置 plugin</li>
+<li>处理 module（递归解析依赖）</li>
+<li>生成 bundle</li>
+</ol>
+<p>由于只需要进行分析依赖，所以执行完第三步的时候我们直接终止 webpack 的后续流程，不再进行生成 chunk 以及对 chunk 做的合并优化等过程，这样就可以节省很大一部分时间。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pluginName = <span class="string">"FastDependenciesAnalyzerPlugin"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">FastDependenciesAnalyzerPlugin</span> </span>&#123;</span><br><span class="line">  beforeResolve(resolveData, callback) &#123;&#125;</span><br><span class="line"></span><br><span class="line">  afterResolve(result, callback) &#123;&#125;</span><br><span class="line"></span><br><span class="line">  apply(compiler) &#123;</span><br><span class="line">    compiler.hooks.normalModuleFactory.tap(pluginName, nmf =&gt; &#123;</span><br><span class="line">      nmf.hooks.beforeResolve.tapAsync(pluginName, <span class="keyword">this</span>.beforeResolve);</span><br><span class="line">      nmf.hooks.afterResolve.tapAsync(pluginName, <span class="keyword">this</span>.afterResolve);</span><br><span class="line">    &#125;);</span><br><span class="line">    compiler.hooks.compilation.tap(pluginName, compilation =&gt; &#123;</span><br><span class="line">      compilation.hooks.finishModules.tapAsync(</span><br><span class="line">        pluginName,</span><br><span class="line">        <span class="keyword">this</span>.handleFinishModules</span><br><span class="line">      );</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要监听两个地方：</p>
+<ul>
+<li>在 complier.hooks.normalModuleFactory 这个 hook 的回调中继续监听 normalModuleFactory 的 beforeResolve hook 和 beforeResolve hook。</li>
+<li>在 complier.hooks.compilation 这个 hooks 的回调中继续监听 compilation 的 finishModules hook。</li>
+</ul>
+<p>然后继续进行改造</p>
+<h3 id="beforeResolve"><a href="#beforeResolve" class="headerlink" title="beforeResolve"></a>beforeResolve</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">beforeResolve(resolveData, callback) &#123;</span><br><span class="line">   <span class="keyword">const</span> &#123; context, contextInfo, request &#125; = resolveData;</span><br><span class="line">   <span class="keyword">const</span> &#123; issuer &#125; = contextInfo;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">return</span> (</span><br><span class="line">     ignoreDependenciesArr.some(<span class="function"><span class="params">item</span> =&gt;</span> request.includes(item)) ||</span><br><span class="line">     issuer.includes(<span class="string">"node_modules"</span>)</span><br><span class="line">   );</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>context 表示为 解析目录的绝对路径，一个页面的 context 都是一样的， issuer 在 webpack 中表示本模块被依赖的对象路径，也就指向这个模块的来源，request 表示当前模块的的请求路径。<br>比如：banner.js 的资源路径为：/xx/xxx/banner.js ，<br>文件内容是这样的：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"./utils"</span>;</span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"@utils"</span>;</span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="keyword">import</span> utils <span class="keyword">from</span> <span class="string">"utils"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>所以对于 utils 模块来说， issuer 的值为 /xx/xxx/banner.js， request 的值分别为 “./utils.js”、”@utils”、”utils” 。<br>此时，我们只能知道当前模块的来源路径 issuer 以及它被请求的路径 request，拿不到当前模块的真实路径，还无法将它放入我们的依赖树中，所以我们不会在 beforeReslove 中处理我们的依赖树，我们在这一步中只是想屏蔽掉一些我们不想被处理的模块就可以，比如假设 utils 这个 npm 包里有非常多的小模块，这些模块不会被放到依赖树中，所以对于这些模块我们选择直接跳过。<br>对于在 beforeResolve 中没有返回值的模块会直接 callback ，在 webpack 源码中 callback 里如果没有参数，往往意味着流程的提前结束，在 beforeResolve 中 return callback 也就没有这个模块后续对 reslove 和 build 流程了，这就实现了模块跳过。</p>
+<h3 id="afterResolve"><a href="#afterResolve" class="headerlink" title="afterResolve"></a>afterResolve</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">afterResolve(result, callback) &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; resourceResolveData &#125; = result;</span><br><span class="line">  <span class="keyword">const</span> &#123;</span><br><span class="line">    context:&#123;</span><br><span class="line">      issuer</span><br><span class="line">      &#125;,</span><br><span class="line">    path</span><br><span class="line">  &#125; = resourceResolveData;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 这里添加依赖到依赖树</span></span><br></pre></td></tr></table></figure>
+
+<p>webpack 使用 <a href="https://www.npmjs.com/package/enhanced-resolve" target="_blank" rel="noopener">enhanced-resolve</a> 对一个请求路径作解析，只需要传入模块的 contextInfo, context,<br>request, 即可拿到当前模块的真实路径，当然前提是需要告知 enhanced-resolve ，这个模块所在 repo 的 package.json， webpack 配置中的 alias 信息等等。<br>总之，在 afterReslove 中我们能够拿到 webpack 借用 enhanced-resolve 解析过后的模块路径了，还有依赖这个模块的父模块路径，将这两个路径添加到依赖树中，经过简单的递归操作就可以拿到完整的依赖树了，当然在依赖树中我们可以放置各种信息，比如是否是一个模块？是否是一个 js 文件、是否是一个 css 文件，这些都可以实现。</p>
+<h3 id="一些坑"><a href="#一些坑" class="headerlink" title="一些坑"></a>一些坑</h3><ol>
+<li><p>对于在 js 中引用的 css 或者 scss 文件，可以通过寻常的 reslove 流程拿到依赖，但是如果在 css 中使用了 @import 语法，由于 css-loader 会自行处理这些语法，所以它不会走 webpack 本身的 reslove 流程，详见<a href="https://github.com/webpack-contrib/css-loader/issues/755" target="_blank" rel="noopener">issue</a>，这里得我们自己在 beforeReslove 中对这部分做额外对处理，比如通过字符串截取的方式去掉 request 中关于 loder 描述的部分，再通过主动调用 enhance-resolve 这个方法实现对 @import 传进来对模块做处理，最终拿到正确的路径。</p>
+</li>
+<li><p>不同版本的 webpack 一些 hook 的用法和名称会不一样，开发者在处理内部流程的时候要注意。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck6z734re0004ykjf4h1v7kvn" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          TypeScript————类型相关总结
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">避免面向监狱编程</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#第一种实现方法"><span class="toc-number">1.</span> <span class="toc-text">第一种实现方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#第一步"><span class="toc-number">1.1.</span> <span class="toc-text">第一步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第二步"><span class="toc-number">1.2.</span> <span class="toc-text">第二步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#第三步"><span class="toc-number">1.3.</span> <span class="toc-text">第三步</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#第二种实现方法"><span class="toc-number">2.</span> <span class="toc-text">第二种实现方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#beforeResolve"><span class="toc-number">2.1.</span> <span class="toc-text">beforeResolve</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#afterResolve"><span class="toc-number">2.2.</span> <span class="toc-text">afterResolve</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一些坑"><span class="toc-number">2.3.</span> <span class="toc-text">一些坑</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2020 x1eJian&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;youemail@outlook.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>TypeScript————类型相关总结 | x1eJian&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1. interface 和 typeinterface 的特点  interface 和同名 interface、class 自动聚合 自身只能表示 object&#x2F;class&#x2F;function 的类型  type 特点  不局限于 object&#x2F;class&#x2F;function 不可以重名 更复杂的类型操作  所以一般是自用一般是 type 提供 api 相关用 interface 2. &amp;amp;">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript————类型相关总结">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;01&#x2F;20&#x2F;%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9&#x2F;index.html">
+<meta property="og:site_name" content="x1eJian&#39;s blog">
+<meta property="og:description" content="1. interface 和 typeinterface 的特点  interface 和同名 interface、class 自动聚合 自身只能表示 object&#x2F;class&#x2F;function 的类型  type 特点  不局限于 object&#x2F;class&#x2F;function 不可以重名 更复杂的类型操作  所以一般是自用一般是 type 提供 api 相关用 interface 2. &amp;amp;">
+<meta property="og:locale" content="zh">
+<meta property="og:updated_time" content="2020-02-23T14:42:34.095Z">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">x1eJian&#39;s blog</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-记录一些使用TypeScript时碰到的坑点" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" class="article-date">
+  <time datetime="2020-01-20T06:04:59.000Z" itemprop="datePublished">2020-01-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      TypeScript————类型相关总结
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h3 id="1-interface-和-type"><a href="#1-interface-和-type" class="headerlink" title="1. interface 和 type"></a>1. interface 和 type</h3><p>interface 的特点</p>
+<ol>
+<li>interface 和同名 interface、class 自动聚合</li>
+<li>自身只能表示 object/class/function 的类型</li>
+</ol>
+<p>type 特点</p>
+<ol>
+<li>不局限于 object/class/function</li>
+<li>不可以重名</li>
+<li>更复杂的类型操作</li>
+</ol>
+<p>所以一般是自用一般是 type 提供 api 相关用 interface</p>
+<h3 id="2-amp-操作符"><a href="#2-amp-操作符" class="headerlink" title="2. &amp; | 操作符"></a>2. &amp; | 操作符</h3><p>只是写法上跟位运算符相同，实际意义为：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> IA &#123;</span><br><span class="line">  a: <span class="built_in">number</span>;</span><br><span class="line">  b: <span class="built_in">number</span>[];</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">interface</span> IB &#123;</span><br><span class="line">  b: <span class="built_in">number</span>[];</span><br><span class="line">  c: <span class="built_in">string</span>[];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TA = IA | IB; <span class="comment">// 包含ab或者bc即可</span></span><br><span class="line"><span class="keyword">type</span> TB = IA &amp; IB; <span class="comment">// 必须包含abc</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-泛型"><a href="#3-泛型" class="headerlink" title="3. 泛型"></a>3. 泛型</h3><p>在定义一个函数、type、interface、class 时，在名称后面加上&lt;&gt;表示即接受类型参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 定义</span><br><span class="line">class React.Component&lt;P = &#123;&#125;, S = &#123;&#125;, SS = any&gt; &#123;&#125;</span><br><span class="line">// 调用</span><br><span class="line">class Login extends React.Component&lt;ILoginProps, ILoginState&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-复杂的条件类型"><a href="#4-复杂的条件类型" class="headerlink" title="4. 复杂的条件类型"></a>4. 复杂的条件类型</h3><p>条件也支持运算 与三目运算类似</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> IsEqualType&lt;A, B&gt; = A <span class="keyword">extends</span> B ? (B <span class="keyword">extends</span> A ? <span class="literal">true</span> : <span class="literal">false</span>) : <span class="literal">false</span>;</span><br><span class="line"><span class="keyword">type</span> NumberEqualsToString = IsEqualType&lt;<span class="built_in">number</span>, <span class="built_in">string</span>&gt;; <span class="comment">// false</span></span><br><span class="line"><span class="keyword">type</span> NumberEqualsToNumber = IsEqualType&lt;<span class="built_in">number</span>, <span class="built_in">number</span>&gt;; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-其他环境的变量"><a href="#5-其他环境的变量" class="headerlink" title="5. 其他环境的变量"></a>5. 其他环境的变量</h3><p>在实际应用开发时有一种场景，当前作用域下可以访问某个变量，但这个变量并不由开发者控制。例如通过 Script 标签直接引入的第三方库 CDN、一些宿主环境的 api 等。这个时候可以利用 ts 的环境声明功能，来告诉 TS 当前作用域可以访问这些变量，以获得类型提醒。</p>
+<ol>
+<li>declare</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">declare</span> <span class="keyword">const</span> IS_MOBILE = <span class="literal">true</span>; <span class="comment">// 编译后此行消失</span></span><br><span class="line"><span class="keyword">const</span> wording = IS_MOBILE ? <span class="string">'移动端'</span> : <span class="string">'PC端'</span>;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>/// 指令</li>
+</ol>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// &lt;reference path="../typings/monaco.d.ts" /&gt;</span></span><br><span class="line"><span class="keyword">const</span> range = <span class="keyword">new</span> monaco.Range(<span class="number">2</span>, <span class="number">3</span>, <span class="number">6</span>, <span class="number">7</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-类型转换"><a href="#6-类型转换" class="headerlink" title="6. 类型转换"></a>6. 类型转换</h3><p>以下是常见的类型转换方法</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// set</span></span><br><span class="line"><span class="keyword">type</span> TSize = <span class="string">'small'</span> | <span class="string">'default'</span> | <span class="string">'big'</span> | <span class="string">'large'</span>;</span><br><span class="line"><span class="comment">// map</span></span><br><span class="line"><span class="keyword">interface</span> IA &#123;</span><br><span class="line">  a: <span class="built_in">number</span>;</span><br><span class="line">  b: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// map =&gt; set</span></span><br><span class="line"><span class="keyword">type</span> IAKeys = keyof IA; <span class="comment">// "a" | "b"</span></span><br><span class="line"><span class="keyword">type</span> IAValues = IA[keyof IA]; <span class="comment">// string | number</span></span><br><span class="line"><span class="comment">// set =&gt; map</span></span><br><span class="line"><span class="keyword">type</span> TMap = &#123;</span><br><span class="line">  [k <span class="keyword">in</span> TSize]: <span class="built_in">number</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// 根据索引取值</span></span><br><span class="line"><span class="keyword">type</span> SubA = IA[<span class="string">'a'</span>]; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="7-工具类型"><a href="#7-工具类型" class="headerlink" title="7. 工具类型"></a>7. 工具类型</h3><p>这些类型一般当作工具函数来生成一些派生类型</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Size = <span class="string">'small'</span> | <span class="string">'default'</span> | <span class="string">'big'</span>;</span><br><span class="line"><span class="keyword">type</span> Result = <span class="number">1</span> | <span class="number">2</span> | <span class="number">3</span> | <span class="string">'error'</span> | <span class="string">'success'</span>;</span><br><span class="line"><span class="keyword">type</span> Record&lt;K <span class="keyword">extends</span> keyof <span class="built_in">any</span>, T&gt; = &#123; [P <span class="keyword">in</span> K]: T &#125;; <span class="comment">// set =&gt; map</span></span><br><span class="line"><span class="keyword">type</span> Extract&lt;T, U&gt; = T <span class="keyword">extends</span> U ? T : never; <span class="comment">// 保留set的一部分</span></span><br><span class="line"><span class="keyword">type</span> Exclude&lt;T, U&gt; = T <span class="keyword">extends</span> U ? never : T; <span class="comment">// 删除set的一部分</span></span><br><span class="line"><span class="keyword">type</span> Pick&lt;T, K <span class="keyword">extends</span> keyof T&gt; = &#123; [P <span class="keyword">in</span> K]: T[P] &#125;; <span class="comment">// 保留map的某些属性</span></span><br><span class="line"><span class="keyword">type</span> Omit&lt;T, K&gt; = Pick&lt;T, Exclude&lt;keyof T, K&gt;&gt;; <span class="comment">// 删除map的某些属性</span></span><br><span class="line"><span class="keyword">type</span> SizeMap = Record&lt;Size, <span class="built_in">number</span>&gt;;</span><br><span class="line"><span class="keyword">type</span> StringResult = Extract&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 'error' | 'success</span></span><br><span class="line"><span class="keyword">type</span> NumericResult = Exclude&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 1 | 2 | 3</span></span><br><span class="line"><span class="keyword">type</span> BiggerSizeMap = Pick&lt;SizeMap, <span class="string">'default'</span> | <span class="string">'big'</span>&gt;; <span class="comment">// 保留了 default和 big</span></span><br><span class="line"><span class="keyword">type</span> DefaultSizeMap = Omit&lt;BiggerSizeMap, <span class="string">'big'</span>&gt;; <span class="comment">// 删除big</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：尽量不要滥用这些工具类型，使用过多的工具类型会使可读性变差，而且容易发生一些错误，契约高于实现，大部分情况还是使用直观的 interface、type。以上这些工具类型都已经包含在了 TS 标准库中，在应用中直接输入名字进行使用即可(老版本 typescript 需要手动写)。</p>
+</blockquote>
+<h3 id="8-never-infer-typeof-三个比较重要的参数"><a href="#8-never-infer-typeof-三个比较重要的参数" class="headerlink" title="8. never infer typeof 三个比较重要的参数"></a>8. never infer typeof 三个比较重要的参数</h3><p>先说三个概念：幺元、零元、逆元 用数字表示可以近似表示为 1 0 -1</p>
+<p>never 是 | 运算的幺元，即 x | never = x</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> NumericResult = Exclude&lt;Result, <span class="built_in">string</span>&gt;; <span class="comment">// 1 | 2 | 3</span></span><br><span class="line"><span class="comment">// 过程是 1 | 2 | 3 | 'error' | 'success' =&gt; 1 | 2 | 3 | never | never =&gt; 1 | 2 | 3</span></span><br></pre></td></tr></table></figure>
+
+<p>infer 的作用是让 TypeScript 自己推断，并将推断的结果存储到一个临时名字中，并且只能用于 extends 语句中。它与泛型的区别在于，泛型是声明一个“参数”，而 infer 是声明一个“中间变量”。官方示例。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Unpacked&lt;T&gt; = T <span class="keyword">extends</span> (infer U)[]</span><br><span class="line">  ? U</span><br><span class="line">  : T <span class="keyword">extends</span> (...args: <span class="built_in">any</span>[]) =&gt; infer U</span><br><span class="line">  ? U</span><br><span class="line">  : T <span class="keyword">extends</span> <span class="built_in">Promise</span>&lt;infer U&gt;</span><br><span class="line">  ? U</span><br><span class="line">  : T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> T0 = Unpacked&lt;<span class="built_in">string</span>&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T1 = Unpacked&lt;<span class="built_in">string</span>[]&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T2 = Unpacked&lt;<span class="function"><span class="params">()</span> =&gt;</span> <span class="built_in">string</span>&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T3 = Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;&gt;; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">type</span> T4 = Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;[]&gt;; <span class="comment">// Promise&lt;string&gt;</span></span><br><span class="line"><span class="keyword">type</span> T5 = Unpacked&lt;Unpacked&lt;<span class="built_in">Promise</span>&lt;<span class="built_in">string</span>&gt;[]&gt;&gt;; <span class="comment">// string</span></span><br></pre></td></tr></table></figure>
+
+<p>typeof 用于获取一个“常量”的类型，这里的“常量”是指任何可以在编译期确定的东西，例如 const、function、class 等。它是从 实际运行代码 通向 类型系统 的单行道。理论上，任何运行时的符号名想要为类型系统所用，都要加上 typeof。但是 class 比较特殊不需要加，因为 ts 的 class 出现得比 js 早，现有的为兼容性解决方案。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> config = &#123; width: <span class="number">2</span>, height: <span class="number">2</span> &#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getLength</span>(<span class="params">str: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> str.length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> TConfig = <span class="keyword">typeof</span> config; <span class="comment">// &#123; width: number, height: number &#125;</span></span><br><span class="line"><span class="keyword">type</span> TGetLength = <span class="keyword">typeof</span> getLength; <span class="comment">// (str: string) =&gt; number</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="9-其他杂项"><a href="#9-其他杂项" class="headerlink" title="9. 其他杂项"></a>9. 其他杂项</h3><p>类型转换的语法为 &lt;类型名&gt; xxx 或 xxx as 类型名。推荐始终用 as 语法，因为第一种语法无法在 tsx 文件使用，而且容易和泛型混淆。一般只有这几种场景需要使用类型转换：自动推断不准；TS 报错，想不出更好的类型编写方法，手动抄近路；临时“放飞自我”。<br>在使用类型转换时，应该遵守几个原则：</p>
+<ol>
+<li>若要放松限制，只可放松到能运行的最严格类型上</li>
+<li>如果不知道一个变量的精确类型，只标注到大概类型（例如 any[]）也比 any 好</li>
+<li>任何一段“放飞自我”（完全没有类型覆盖）区代码不应超过 2 行，应在出现第一个可以确定类型的变量时就补上标注</li>
+</ol>
+<p>尽量不使用 enum，它引入了 JavaScript 没有的数据结构（编译成一个双向 map），入侵了运行时，与 TypeScript 宗旨不符。用 string literal union（’small’ | ‘big’ | ‘large’）可以做到相同的事，且在 debug 时可读性更好。如果很在意条件比较的性能，应该用二进制 flag 加位运算。</p>
+<h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><ul>
+<li><a href="https://www.tslang.cn/docs/handbook/advanced-types.html" target="_blank" rel="noopener">TypeScript 文档 —— 高级类型</a></li>
+<li><a href="https://juejin.im/user/5d0254a35188254c9f4feaf1" target="_blank" rel="noopener">腾讯 AlloyTeam</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck6z734rf0005ykjfa46r963k" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          从零创建一个项目要做的工作（一）
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">清理项目中的无效代码</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-interface-和-type"><span class="toc-number">1.</span> <span class="toc-text">1. interface 和 type</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-amp-操作符"><span class="toc-number">2.</span> <span class="toc-text">2. &amp; | 操作符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-泛型"><span class="toc-number">3.</span> <span class="toc-text">3. 泛型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-复杂的条件类型"><span class="toc-number">4.</span> <span class="toc-text">4. 复杂的条件类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-其他环境的变量"><span class="toc-number">5.</span> <span class="toc-text">5. 其他环境的变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-类型转换"><span class="toc-number">6.</span> <span class="toc-text">6. 类型转换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-工具类型"><span class="toc-number">7.</span> <span class="toc-text">7. 工具类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-never-infer-typeof-三个比较重要的参数"><span class="toc-number">8.</span> <span class="toc-text">8. never infer typeof 三个比较重要的参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-其他杂项"><span class="toc-number">9.</span> <span class="toc-text">9. 其他杂项</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#参考："><span class="toc-number">10.</span> <span class="toc-text">参考：</span></a></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2020 x1eJian&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;youemail@outlook.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>

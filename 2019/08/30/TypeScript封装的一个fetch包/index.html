@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>TypeScript封装的一个fetch包 | x1eJian&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="自己封了个 fetch ，总结一下几个关键点1. 定义好要用的interface1234567891011121314151617181920212223242526import &amp;#123; Omit &amp;#125; from &amp;apos;.&#x2F;util&amp;apos;export enum EMethod &amp;#123;  Get = &amp;apos;GET&amp;apos;,  Post = &amp;apos;POST&amp;apos;,  Put = &amp;apos;PUT&amp;apos;,  Delete">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TypeScript封装的一个fetch包">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;08&#x2F;30&#x2F;TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85&#x2F;index.html">
+<meta property="og:site_name" content="x1eJian&#39;s blog">
+<meta property="og:description" content="自己封了个 fetch ，总结一下几个关键点1. 定义好要用的interface1234567891011121314151617181920212223242526import &amp;#123; Omit &amp;#125; from &amp;apos;.&#x2F;util&amp;apos;export enum EMethod &amp;#123;  Get = &amp;apos;GET&amp;apos;,  Post = &amp;apos;POST&amp;apos;,  Put = &amp;apos;PUT&amp;apos;,  Delete">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20191007202531.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20191007203309.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20191007203431.jpg">
+<meta property="og:updated_time" content="2020-02-23T14:42:43.711Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20191007202531.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">x1eJian&#39;s blog</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-TypeScript封装的一个fetch包" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" class="article-date">
+  <time datetime="2019-08-30T13:06:19.000Z" itemprop="datePublished">2019-08-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      TypeScript封装的一个fetch包
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="自己封了个-fetch-，总结一下几个关键点"><a href="#自己封了个-fetch-，总结一下几个关键点" class="headerlink" title="自己封了个 fetch ，总结一下几个关键点"></a>自己封了个 fetch ，总结一下几个关键点</h1><h2 id="1-定义好要用的interface"><a href="#1-定义好要用的interface" class="headerlink" title="1. 定义好要用的interface"></a>1. 定义好要用的interface</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Omit &#125; <span class="keyword">from</span> <span class="string">'./util'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">enum</span> EMethod &#123;</span><br><span class="line">  Get = <span class="string">'GET'</span>,</span><br><span class="line">  Post = <span class="string">'POST'</span>,</span><br><span class="line">  Put = <span class="string">'PUT'</span>,</span><br><span class="line">  Delete = <span class="string">'DELETE'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchResponse &#123;</span><br><span class="line">  data: <span class="built_in">any</span></span><br><span class="line">  msg: <span class="built_in">string</span></span><br><span class="line">  success: <span class="built_in">boolean</span></span><br><span class="line">  RetCode: <span class="built_in">number</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchConfig <span class="keyword">extends</span> Omit&lt;RequestInit, 'body'&gt; &#123;</span><br><span class="line">  method?: <span class="string">'GET'</span> | <span class="string">'POST'</span> | <span class="string">'PUT'</span> | <span class="string">'DELETE'</span></span><br><span class="line">  body?: object</span><br><span class="line">  dataType?: <span class="string">'hlj'</span> | <span class="string">'json'</span> | <span class="string">'text'</span></span><br><span class="line">  bodyType?: <span class="string">'json'</span> | <span class="string">'file'</span></span><br><span class="line">  codeKey?: <span class="built_in">string</span></span><br><span class="line">  ignore?: <span class="built_in">any</span>[]</span><br><span class="line">  onError?: <span class="function">(<span class="params">(<span class="params">RetCode, msg</span>) =&gt; <span class="built_in">void</span></span>) | <span class="params">null</span> | <span class="params">false</span></span></span><br><span class="line"><span class="function">  <span class="params">expect</span>?: <span class="params">any</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>请求的方法、返回的格式、请求体的格式、都定义好按照这个来，有一点是原生的RequestInit的body是必传的，根据我的需求body可以不传，所以omit掉了。（注： 最新的ts好像内置omit方法）附omit方法：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Omit&lt;T, K&gt; = Pick&lt;T, Exclude&lt;keyof T, K&gt;&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-参数的处理"><a href="#2-参数的处理" class="headerlink" title="2.参数的处理"></a>2.参数的处理</h2><p>原本的参数是一个对象的形式，get、delete请求方法时候要把对象转化成字符串拼接到url上</p>
+<h2 id="3-文件的处理"><a href="#3-文件的处理" class="headerlink" title="3.文件的处理"></a>3.文件的处理</h2><p>为了满足上传文件的需要，定义了一个 ‘file’ 类型的请求方式用于上传文件,使用FormData实现</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 上传文件</span></span><br><span class="line"><span class="keyword">if</span> (bodyType === <span class="string">'file'</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">new</span> FormData()</span><br><span class="line">  <span class="built_in">Object</span>.keys(body).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    data.append(key, body[key])</span><br><span class="line">  &#125;)</span><br><span class="line">  requestInit.body = data</span><br><span class="line">  <span class="keyword">delete</span> requestInit.headers[<span class="string">'Content-Type'</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-fetch可配置化"><a href="#4-fetch可配置化" class="headerlink" title="4. fetch可配置化"></a>4. fetch可配置化</h2><p>每个项目中可能有不同的配置，比如自定义的统一错误提示、自定义的header</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> configure = <span class="function">(<span class="params">&#123; config, ...rest &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (isFunction(config)) &#123;</span><br><span class="line">    globalConfig = config(globalConfig)</span><br><span class="line">  &#125;</span><br><span class="line">  globalConfig = &#123; ...globalConfig, ...rest &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本地项目中可以调用configure方法 把自己自定义的配置merge上去。</p>
+<h2 id="5-写测试"><a href="#5-写测试" class="headerlink" title="5.写测试"></a>5.写测试</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">"dependencies": &#123;</span><br><span class="line">    "@babel/core": "^7.4.5",</span><br><span class="line">    "@babel/preset-env": "^7.4.5",</span><br><span class="line">    "@babel/preset-typescript": "^7.3.3",</span><br><span class="line">    "@ryzen/eslint-config-ryzen": "^1.0.9",</span><br><span class="line">    "@types/jest": "^24.0.13",</span><br><span class="line">    "babel-jest": "^24.8.0",</span><br><span class="line">    "eslint": "4.19.1",</span><br><span class="line">    "global": "^4.3.2",</span><br><span class="line">    "jest": "^24.8.0",</span><br><span class="line">    "microbundle": "^0.11.0"</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> http, &#123; createApi &#125; <span class="keyword">from</span> <span class="string">'../src'</span></span><br><span class="line"></span><br><span class="line">test(<span class="string">'http, createApi, should have 4 method, get, post, post, delete'</span>, () =&gt; &#123;</span><br><span class="line">  ;[http, createApi].forEach(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'post'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'get'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'delete'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'put'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p><img src="/image/20191007202531.jpg" alt=""><br>对每一个必要的模块加上单元测试，这样再次迭代之后跑一下jest就不怕改坏了。</p>
+<h2 id="6-使用lerna进行多包管理"><a href="#6-使用lerna进行多包管理" class="headerlink" title="6.使用lerna进行多包管理"></a>6.使用lerna进行多包管理</h2><p>因为这个包依赖了其他自己写的包（eslint-config包）并且使用lerna可以方便的管理package之间的依赖、一键发布、打changelog等 </p>
+<p><img src="/image/20191007203309.jpg" alt=""><br><img src="/image/20191007203431.jpg" alt="lerna的多包管理"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck6z734r70000ykjf20zth8ua" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+    <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">
+        
+          开发过程中webpack内存溢出问题
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#自己封了个-fetch-，总结一下几个关键点"><span class="toc-number">1.</span> <span class="toc-text">自己封了个 fetch ，总结一下几个关键点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-定义好要用的interface"><span class="toc-number">1.1.</span> <span class="toc-text">1. 定义好要用的interface</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-参数的处理"><span class="toc-number">1.2.</span> <span class="toc-text">2.参数的处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-文件的处理"><span class="toc-number">1.3.</span> <span class="toc-text">3.文件的处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-fetch可配置化"><span class="toc-number">1.4.</span> <span class="toc-text">4. fetch可配置化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-写测试"><span class="toc-number">1.5.</span> <span class="toc-text">5.写测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-使用lerna进行多包管理"><span class="toc-number">1.6.</span> <span class="toc-text">6.使用lerna进行多包管理</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2020 x1eJian&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;youemail@outlook.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
