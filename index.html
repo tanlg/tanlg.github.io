@@ -65,6 +65,133 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-从零创建一个项目要做的工作（二）" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
+  <time datetime="2020-03-30T14:19:17.000Z" itemprop="datePublished">2020-03-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>这一篇主要是总结一些 linters 和 formatter 来辅助我们 coding。<br>主要是：</p>
+<ul>
+<li>eslint</li>
+<li>prettier</li>
+<li>其他小众 linter</li>
+</ul>
+<h2 id="eslint"><a href="#eslint" class="headerlink" title="eslint"></a>eslint</h2><p>eslint 可以帮助我们检查代码的错误，同时具备一些格式化代码的能力（eslint 主要功能不是负责格式化代码，格式化代码应该交给专门的格式化工具，比如 prettier 进行代码格式化。）</p>
+<p>2019 年 2 月份 tslint 团队就宣布了废弃 tslint，转而将维护一系列将 TypeScript 集成到 ESLint 的工具。具体可以看这个<a href="https://github.com/palantir/tslint/issues/4534" target="_blank" rel="noopener">issue</a></p>
+<p>前端绝大多数构建工具都是用 node 编写模块来提供 API 或命令行工具，本质上就是解析用户输入调用 node API，然后可以通过配置文件来配置选项和集成插件。配置 eslint 建议使用 eslint 命令行工具提供的交互式配置生成器。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#安装</span></span><br><span class="line">yarn add eslint -D</span><br><span class="line"><span class="comment"># 生成默认的eslint config</span></span><br><span class="line">npx eslint --init</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol>
+<li>注意有一步是 Does your project use TypeScript? 这个要选 Y<br>当然如果想自己定制化地去配置 eslint 并且自己比较熟悉，可以去<a href="https://eslint.org/" target="_blank" rel="noopener">官网</a>找对应的 rules</li>
+<li>eslintrc 文件支持多种<a href="https://eslint.org/docs/user-guide/configuring#configuration-file-formats" target="_blank" rel="noopener">文件格式</a> 比如:<ul>
+<li>.eslintrc.js</li>
+<li>.eslintrc.cjs</li>
+<li>.eslintrc.yaml</li>
+<li>.eslintrc.yml</li>
+<li>.eslintrc.json</li>
+<li>.eslintrc</li>
+<li>package.json</li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<p>执行完 init 之后 就会生成一个 eslint 配置文件.eslintrc.js</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    es6: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  extends: [<span class="string">"plugin:react/recommended"</span>, <span class="string">"airbnb"</span>],</span><br><span class="line">  globals: &#123;</span><br><span class="line">    Atomics: <span class="string">"readonly"</span>,</span><br><span class="line">    SharedArrayBuffer: <span class="string">"readonly"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  parser: <span class="string">"@typescript-eslint/parser"</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    ecmaFeatures: &#123;</span><br><span class="line">      jsx: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    ecmaVersion: <span class="number">2018</span>,</span><br><span class="line">    sourceType: <span class="string">"module"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [<span class="string">"react"</span>, <span class="string">"@typescript-eslint"</span>],</span><br><span class="line">  rules: &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到 TypeScript 的主要 parser 是 <code>@typescript-eslint/parser</code> 这跟普通的 js 项目的 parser 不同，同时在默认配置加入了<code>@typescript-eslint</code>来更好的支持 TypeScript</p>
+<p>以下是一些注意的点：</p>
+<ol>
+<li>是为了让 <code>eslint-plugin-import</code> 能够正确解析 ts, tsx, json 后缀名，我们还需在 eslintrc 文件指定允许的后缀名，添加 setttings 字段，加入以下配置：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  settings: &#123;</span><br><span class="line">    <span class="string">'import/resolver'</span>: &#123;</span><br><span class="line">      node: &#123;</span><br><span class="line">        extensions: [<span class="string">'.ts'</span>, <span class="string">'.tsx'</span>, <span class="string">'.js'</span>, <span class="string">'.json'</span>],</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>为了让 <code>eslint-plugin-import</code> 能够正确解析 <code>tsconfig.json</code> 中的 paths 映射，我们需要安装 eslint-import-resolver-typescript：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  settings: &#123;</span><br><span class="line">    <span class="string">'import/resolver'</span>: &#123;</span><br><span class="line">      typescript: &#123;</span><br><span class="line">        directory: [resolve(<span class="string">'./src/tsconfig.json'</span>), resolve(<span class="string">'./scripts/tsconfig.json'</span>)],</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>目前 <code>eslint-plugin-import</code> 和 TypeScript 搭配存在 import 无法识别文件后缀的问题<br>可以先修改一下配置使用：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'import/extensions'</span>: [</span><br><span class="line">  <span class="number">2</span>,</span><br><span class="line">  <span class="string">'ignorePackages'</span>,</span><br><span class="line">  &#123;</span><br><span class="line">    ts: <span class="string">'never'</span>,</span><br><span class="line">    tsx: <span class="string">'never'</span>,</span><br><span class="line">    json: <span class="string">'never'</span>,</span><br><span class="line">    js: <span class="string">'never'</span></span><br><span class="line">  &#125;,</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><a href="https://github.com/typescript-eslint/typescript-eslint/issues/420" target="_blank" rel="noopener">这个 bug</a>会导致.d.ts 声明文件中如果使用了 constructor 就会报错，兼容性的配置是：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rules: &#123;</span><br><span class="line">   <span class="string">'no-useless-constructor'</span>: <span class="string">'off'</span>,</span><br><span class="line">   <span class="string">'@typescript-eslint/no-useless-constructor'</span>: <span class="string">'error'</span>,</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+
+<p>总之 TypeScript 和 eslint 之间还是有一些坑的 需要慢慢挖掘…</p>
+<h2 id="prettier"><a href="#prettier" class="headerlink" title="prettier"></a>prettier</h2><p>是目前最好用的格式化工具了，可以统一团队的代码风格</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add prettier -D</span><br></pre></td></tr></table></figure>
+
+<p>添加 .prettierrc 到项目根路径：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"trailingComma"</span>: <span class="string">"all"</span>,</span><br><span class="line">  <span class="attr">"tabWidth"</span>: <span class="number">4</span>,</span><br><span class="line">  <span class="attr">"semi"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"singleQuote"</span>: <span class="literal">true</span>,</span><br><span class="line">  <span class="attr">"endOfLine"</span>: <span class="string">"auto"</span>,</span><br><span class="line">  <span class="attr">"printWidth"</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">"overrides"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"files"</span>: <span class="string">"*.md"</span>,</span><br><span class="line">      <span class="attr">"options"</span>: &#123;</span><br><span class="line">        <span class="attr">"tabWidth"</span>: <span class="number">2</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解决-eslint-和-prettier-的冲突"><a href="#解决-eslint-和-prettier-的冲突" class="headerlink" title="解决 eslint 和 prettier 的冲突"></a>解决 eslint 和 prettier 的冲突</h3><p>查阅<a href="https://prettier.io/docs/en/integrating-with-linters.html" target="_blank" rel="noopener">文档</a>我们得知 lint 工具是用来检查代码风格的， prettier 是用来格式化代码的。如果 prettier 设置缩进为 4 个空格，而我们配置的 eslint 是要求缩进为 2 个空格，这肯定会导致我们格式化代码之后，eslint 会报缩进错误。所以我们要禁用掉掉那些会和 prettier 格式化起冲突的规则。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add eslint-config-prettier -D</span><br></pre></td></tr></table></figure>
+
+<p>添加 ‘prettier’，’prettier/react’，‘prettier/@typescript-eslint’ 到 extends 配置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注意要把 prettier 放最后面</span></span><br><span class="line">&#123;</span><br><span class="line">  extends: [</span><br><span class="line">    <span class="string">'airbnb'</span>,</span><br><span class="line">    <span class="string">'airbnb/hooks'</span>,</span><br><span class="line">    <span class="string">'plugin:eslint-comments/recommended'</span>,</span><br><span class="line">    <span class="string">'plugin:import/typescript'</span>,</span><br><span class="line">    <span class="string">'plugin:react/recommended'</span>,</span><br><span class="line">    <span class="string">'plugin:@typescript-eslint/recommended'</span>,</span><br><span class="line">    <span class="string">'prettier'</span>,</span><br><span class="line">    <span class="string">'prettier/react'</span>,</span><br><span class="line">    <span class="string">'prettier/@typescript-eslint'</span>,</span><br><span class="line">  ],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>stylelint 也是一样，先安装插件 stylelint-config-prettier：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yarn add stylelint-config-prettier -D</span><br></pre></td></tr></table></figure>
+
+<p>再将 “stylelint-config-prettier” 添加到 extends 数组最后面：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// .stylelintrc.json</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"extends"</span>: [</span><br><span class="line">    <span class="string">"stylelint-config-standard"</span>,</span><br><span class="line">    <span class="string">"stylelint-config-rational-order"</span>,</span><br><span class="line">    <span class="string">"stylelint-config-prettier"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以避免 linter 和 formatter 的冲突了</p>
+<p>一般 用好 eslint 和 prettier 我们的项目就可以很好的跑起来了，要是要求更严格一些还可以加入以下拓展的功能</p>
+<h3 id="可选拓展功能"><a href="#可选拓展功能" class="headerlink" title="可选拓展功能"></a>可选拓展功能</h3><p>还有一些可选的 linter、formatter:</p>
+<ol>
+<li>lint-staged 自动格式化</li>
+<li>husky 给 git 配置 hooks 使我们在做某些 git 操作的时候触发一些对代码的操作（比如格式化）</li>
+<li>commitlint 对 commit message 的校验</li>
+<li>conventional-changelog 自动生成 change log 的工具</li>
+</ol>
+<p>这些可以根据项目的实际需要选用…</p>
+<p>接下来第三篇打算总结一下 webpack、babel、npm package 相关的点</p>
+<h3 id="参考地址"><a href="#参考地址" class="headerlink" title="参考地址:"></a>参考地址:</h3><ul>
+<li><a href="https://eslint.org/" target="_blank" rel="noopener">eslint</a></li>
+<li><a href="https://prettier.io/" target="_blank" rel="noopener">prettier</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ck8eqpmsj000a18jf41rf8tti" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-从零创建一个项目要做的工作（一）" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
@@ -163,7 +290,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck6z734rd0003ykjf31jm9nlt" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck8eqpmsb000118jf9rw1c63o" class="article-share-link">分享</a>
       
       
       
@@ -265,7 +392,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck6z734rf0005ykjfa46r963k" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck8eqpmsg000518jf0c1q16w7" class="article-share-link">分享</a>
       
       
       
@@ -355,7 +482,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck6z734re0004ykjf4h1v7kvn" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck8eqpmsf000418jf84au28x3" class="article-share-link">分享</a>
       
       
       
@@ -450,7 +577,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck6z734ri0008ykjf14f51nlc" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck8eqpmsi000818jf8yjy864l" class="article-share-link">分享</a>
       
       
       
@@ -517,7 +644,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck6z734ra0001ykjfe6re3fmy" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck8eqpmse000318jf73i6bjwu" class="article-share-link">分享</a>
       
       
       
@@ -574,7 +701,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck6z734r70000ykjf20zth8ua" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck8eqpms7000018jf5s3aare5" class="article-share-link">分享</a>
       
       
       
@@ -637,6 +764,10 @@
       <ul>
         
           <li>
+            <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
+          </li>
+        
+          <li>
             <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
           </li>
         
@@ -652,10 +783,6 @@
             <a href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/">避免面向监狱编程</a>
           </li>
         
-          <li>
-            <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/">开发过程中webpack内存溢出问题</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -665,7 +792,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
