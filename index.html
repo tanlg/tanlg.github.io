@@ -65,6 +65,96 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-业务开发过程中一些事情关于多人协作的记录" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" class="article-date">
+  <time datetime="2020-04-27T14:03:54.000Z" itemprop="datePublished">2020-04-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/">业务开发过程中一些事情关于多人协作的记录</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>在我们开发需求的时候，不可避免会参与开发比较大的需求，为了保证上线时间必然会拆解成多项任务多人进行协作开发，在协作开发过程中会出现一些问题导致开发者效率低下，这篇是一些关于多人协作的问题记录与反思</p>
+<h2 id="多人协作分支管理"><a href="#多人协作分支管理" class="headerlink" title="多人协作分支管理"></a>多人协作分支管理</h2><p>一项新任务 A、B 两位前端开发，一位后端开发。项目前中期是开发时间，这时候通过 mock 或者本地代理测试环境来进行本地调试，调试完成走过测试用例后这时候要让测试介入进行测试。这时候两位前端的做法可以是：a (或 b) 把 branch-b(或 branch-a)支合并到 branch-a(或 branch-b) 然后把 branch-a(或 branch-b)发布到测试机器上。<br>这样会有一些缺点：</p>
+<ol>
+<li><p>不好创建 merge request 因为两人把代码合并到一个分支了，不好确定是以谁的名义点 merge.</p>
+</li>
+<li><p>不好 review 代码，由于两人的代码合并到了一起，修改的代码必然很多。</p>
+</li>
+</ol>
+<p>在最近的多人协作中的做法是： 从 master checkout 一个公共分支 branch-common，然后 A,B 把 branch-a(或 branch-b)合并到 branch-common，把 branch-common 部署到测试机器上,修 bug 的时候在自己的分支修，合并 master 的时候也是合并自己的分支。这样的好处是：</p>
+<ol>
+<li>开发者只需要关注自己的分支即可，修改的 bug 的时候只需要改在自己分支上，然后 merge 到 branch-common.</li>
+<li>由于是两个独立的分支，reviewer 的压力会小，也可以多对多 review.</li>
+<li>之后假如出了 bug 好追溯开发者、时间点（因为自己的分支做 squash 操作 还是自己，如果合并到一个分支做 squash 操作 author 会发生变化）</li>
+</ol>
+<p>同时这样也是存在弊端的：</p>
+<ol>
+<li>测试阶段不好调试：因为两者的代码单独启动是无法跑完整个流程的（业务上存在依赖关系），所以调试只能在公共分支上进行调试，把代码改满意之后进行 git stash 操作 然后切换到自己的分支 stash pop =&gt; add =&gt; commit =&gt; push,然后切换到公共分支 merge 自己的分支，这样看来其实每改动一次都要进行两次切换，比较耗时。</li>
+<li>release pick 的时候由于两个分支存在依赖关系，只能按照顺序来 pick</li>
+<li>假如一个变量在 A 的分支被声明，同时在 B 的分支也需要用到这个变量来完成某些逻辑，这样的话两个分支进行合并的时候就会产生冲突，这种场景还是很频繁的出现的。</li>
+</ol>
+<p>目前来看 是利大于弊，目前这些问题可以通过设置任务的 owner 来解决。</p>
+<h2 id="任务的-owner"><a href="#任务的-owner" class="headerlink" title="任务的 owner"></a>任务的 owner</h2><p>一项需求被拆分成多个小需求后，还是需要有一名开发者作为 owner 来负责 整个流程的，包括：</p>
+<ol>
+<li>公共分支的维护，包括 pick 的顺序 分支依赖关系的确定。</li>
+<li>推动技术反讲： 当需求确定后，开发者确定好成本后要进行技术反讲，这样自己也会清楚要做什么事情、测试也会补充一些没考虑到的情况，从而减少问题暴露晚的情况，使开发、测试、上线流程趋于稳定。</li>
+<li>基础代码的编写： 比如 多人协作完成 n 个页面 这些页面的路由代码编写、A 和 B 共同完成一个页面 这个页面的一些最基础的代码的编写,否则大家各自为战，到最后合并代码的时候必然会出问题。</li>
+<li>及时协调多人协作的进度：比如在某个时间点统一合并代码、解决冲突。</li>
+<li>参与 review 代码</li>
+<li>及时把后端的信息同步到其他开发者，保持步调一致。</li>
+<li>紧急情况的 bug 处理，比如其他开发者出现了 bug 没时间修要去看等一系列问题。</li>
+</ol>
+<p>由于存在一个这样的角色，就会保证 pick 代码、维护开发者都需要改动的地方不会出现问题。<br>其中 owner 应该有的意识：</p>
+<ol>
+<li>认真负责</li>
+<li>积极主动是 owner 更高一级的要求。做好份内工作，也要积极主动做”份外”的工作。推动合作团队进度，保证项目顺利推进。不给自己设限，努力成为更优秀的人。</li>
+<li>工作安排分清主次</li>
+<li>以结果为导向</li>
+<li>沟通要有结论，通知要有反馈</li>
+</ol>
+<p>当然也会有其他更好的多分支管理方法,还需要摸索</p>
+<h2 id="测出的老-bug-怎么处理"><a href="#测出的老-bug-怎么处理" class="headerlink" title="测出的老 bug 怎么处理"></a>测出的老 bug 怎么处理</h2><p>因为代码不是 100%无 bug 的，所以一定会有线上 bug，当在老代码的基础上开发新代码的时候，不可避免的会出现发现老 bug 的情况。<br>这种情况目前的做法是需求开发者尽量去改正，如果无法改正则会备注原因，转成线上 bug。（有一些 bug 是测试环境脏数据导致的，所以查 bug 的时候应该二分法先看接口数据是否合法，判断是前端 bug 还是后端 bug）。<br>要是上线前发现的线上 bug 那就没办法了…<br>无法改正的原因可能是逻辑复杂、模块不熟悉（比如做面试的功能，去创建职位的时候发现了 bug）、合并最新 master 后 master 上的不稳定代码。</p>
+<h2 id="如何去避免机器不够用的情况（待定）"><a href="#如何去避免机器不够用的情况（待定）" class="headerlink" title="如何去避免机器不够用的情况（待定）"></a>如何去避免机器不够用的情况（待定）</h2><p>1.利用多端口：<br>假如 10 台机器 每个机器利用 8 个端口（8080-8088）那么就是 80 个可用环境<br>但只是猜测可以用，不太清楚多端口的具体实现原理（猜测是机器上的多文件夹然后 nginx 做映射？）<br>先 mark 一下</p>
+<h2 id="怎么去确定一项任务的提测时间"><a href="#怎么去确定一项任务的提测时间" class="headerlink" title="怎么去确定一项任务的提测时间"></a>怎么去确定一项任务的提测时间</h2><p>按照实事求是的原则，这个还是等产品过完需求后，接下来根据需求和代码现状分析有哪些改动点，这些的改动点的成本要罗列出来，同时给自己留够足够的 buffer（用于处理其他的事情，比如开会、面试、修 bug、紧急的响应等）。这些东西都罗列清楚后拉着测试和产品进行需求反讲，所有人做到认知统一。之前吃过的亏有：</p>
+<ul>
+<li>产品拍板提测时间：这个自然是不行的，违背了实事求是的原则，对方要是太强硬只能找 dalao 来解决</li>
+<li>10 号提测是 10 号早晨还是晚上： 这个在没有拉平认知之前会产生歧义，测试以为是 10 号早晨来了就能测试，开发认为是 10 号晚上下班之后才能测试，导致产生一些出入，这个问题还是要跟测试进行沟通，不能给一个模棱两可的时间</li>
+<li>提测质量问题：之前遇到的问题是由于开发时间逼得很紧，导致很紧张的进行开发，质量自然是很差的。提给测试也是不好的，现在只要不是特别紧急的需求都是会确定足够的开发时间+buffer 的，开发自然也需要高标准严要求地去开发对应的功能，从目前的时间效果来看，这样比之前匆匆开发的情况要好的多，测试反馈质量比较满意</li>
+</ul>
+<p>之后应该还会遇到其他的坑，只要做到及时响应、反馈，凡事有交代、件件有着落、事事有回音这个原则，问题都会逐一化解。</p>
+<p>注：下次再更新《《从零创建一个项目要做的工作（三）》》</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ck9ijzfwt0008c0jf11th4mav" class="article-share-link">分享</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-从零创建一个项目要做的工作（二）" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" class="article-date">
@@ -178,7 +268,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ck8eqpmsj000a18jf41rf8tti" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ck9ijzfwm0001c0jfduvhh6i5" class="article-share-link">分享</a>
       
       
       
@@ -290,7 +380,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck8eqpmsb000118jf9rw1c63o" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck9ijzfwp0003c0jf7l4u1vwi" class="article-share-link">分享</a>
       
       
       
@@ -392,7 +482,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck8eqpmsg000518jf0c1q16w7" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck9ijzfwu000ac0jffgnzcv85" class="article-share-link">分享</a>
       
       
       
@@ -482,7 +572,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck8eqpmsf000418jf84au28x3" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck9ijzfwr0005c0jf5vxu220l" class="article-share-link">分享</a>
       
       
       
@@ -577,7 +667,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck8eqpmsi000818jf8yjy864l" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck9ijzfwv000cc0jffu0q0x2e" class="article-share-link">分享</a>
       
       
       
@@ -644,7 +734,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck8eqpmse000318jf73i6bjwu" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck9ijzfwq0004c0jfhijv4rk9" class="article-share-link">分享</a>
       
       
       
@@ -701,7 +791,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck8eqpms7000018jf5s3aare5" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck9ijzfwi0000c0jf9coc8mnl" class="article-share-link">分享</a>
       
       
       
@@ -764,6 +854,10 @@
       <ul>
         
           <li>
+            <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/">业务开发过程中一些事情关于多人协作的记录</a>
+          </li>
+        
+          <li>
             <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
           </li>
         
@@ -779,10 +873,6 @@
             <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/">清理项目中的无效代码</a>
           </li>
         
-          <li>
-            <a href="/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/">避免面向监狱编程</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -792,7 +882,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
