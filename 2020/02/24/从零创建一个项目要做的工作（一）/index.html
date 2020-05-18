@@ -5,18 +5,19 @@
   
   <title>从零创建一个项目要做的工作（一） | x1eJian&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="title: 从零创建一个项目要做的工作（一）date: 2020-02-23 22:41:33tags: JavaScript  整理一下从零创建一个项目需要的工作内容，大体分为以下几点：  dot files linter formatter webpack 必要的集成库 一些优化  123mkdir my-projectcd $_git init   1.dot files就是一些.开头的">
+  <meta name="description" content="整理一下从零创建一个项目需要的工作内容，大体分为以下几点：  dot files linter formatter webpack 必要的集成库 一些优化  123mkdir my-projectcd $_git init  1.dot files就是一些.开头的文件，大部分是一些配置文件。这些文件可以让协作开发的时候保持统一的风格，一般前端经常用到的是：  .gitignore .editorc">
+<meta name="keywords" content="JavaScript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从零创建一个项目要做的工作（一）">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;23&#x2F;%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89&#x2F;index.html">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;02&#x2F;24&#x2F;%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89&#x2F;index.html">
 <meta property="og:site_name" content="x1eJian&#39;s blog">
-<meta property="og:description" content="title: 从零创建一个项目要做的工作（一）date: 2020-02-23 22:41:33tags: JavaScript  整理一下从零创建一个项目需要的工作内容，大体分为以下几点：  dot files linter formatter webpack 必要的集成库 一些优化  123mkdir my-projectcd $_git init   1.dot files就是一些.开头的">
+<meta property="og:description" content="整理一下从零创建一个项目需要的工作内容，大体分为以下几点：  dot files linter formatter webpack 必要的集成库 一些优化  123mkdir my-projectcd $_git init  1.dot files就是一些.开头的文件，大部分是一些配置文件。这些文件可以让协作开发的时候保持统一的风格，一般前端经常用到的是：  .gitignore .editorc">
 <meta property="og:locale" content="zh">
 <meta property="og:image" content="https:&#x2F;&#x2F;img.shields.io&#x2F;circleci&#x2F;project&#x2F;github&#x2F;ant-design&#x2F;ant-design&#x2F;master.svg?style=flat-square">
 <meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;ant-design&#x2F;ant-design&#x2F;workflows&#x2F;test&#x2F;badge.svg">
 <meta property="og:image" content="https:&#x2F;&#x2F;img.shields.io&#x2F;codecov&#x2F;c&#x2F;github&#x2F;ant-design&#x2F;ant-design&#x2F;master.svg?style=flat-square">
 <meta property="og:image" content="https:&#x2F;&#x2F;flat.badgen.net&#x2F;npm&#x2F;v&#x2F;antd?icon=npm">
-<meta property="og:updated_time" content="2020-02-23T15:35:56.697Z">
+<meta property="og:updated_time" content="2020-04-27T14:07:47.897Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;img.shields.io&#x2F;circleci&#x2F;project&#x2F;github&#x2F;ant-design&#x2F;ant-design&#x2F;master.svg?style=flat-square">
   
@@ -73,8 +74,8 @@
       <div class="outer">
         <section id="main"><article id="post-从零创建一个项目要做的工作（一）" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
-  <time datetime="2020-02-23T14:41:33.734Z" itemprop="datePublished">2020-02-23</time>
+    <a href="/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
+  <time datetime="2020-02-24T14:41:33.000Z" itemprop="datePublished">2020-02-24</time>
 </a>
     
   </div>
@@ -95,10 +96,7 @@
       
         <!-- Table of Contents -->
         
-        <hr>
-<p>title: 从零创建一个项目要做的工作（一）<br>date: 2020-02-23 22:41:33<br>tags: JavaScript</p>
-<hr>
-<p>整理一下从零创建一个项目需要的工作内容，大体分为以下几点：</p>
+        <p>整理一下从零创建一个项目需要的工作内容，大体分为以下几点：</p>
 <ol>
 <li>dot files</li>
 <li>linter formatter</li>
@@ -108,7 +106,6 @@
 </ol>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir my-project</span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$_</span></span><br><span class="line">git init</span><br></pre></td></tr></table></figure>
 
-
 <h2 id="1-dot-files"><a href="#1-dot-files" class="headerlink" title="1.dot files"></a>1.dot files</h2><p>就是一些.开头的文件，大部分是一些配置文件。这些文件可以让协作开发的时候保持统一的风格，一般前端经常用到的是：</p>
 <ul>
 <li>.gitignore</li>
@@ -117,62 +114,69 @@
 <li>.npmrc</li>
 <li>LICENSE</li>
 <li>package.json</li>
-<li>settings.json（vsCode专属）</li>
+<li>settings.json（vsCode 专属）</li>
 <li>README.md</li>
 </ul>
 <p>等等</p>
-<h3 id="gitignore"><a href="#gitignore" class="headerlink" title=".gitignore"></a>.gitignore</h3><p>在这可以配置一些文件，使其不被git监控，比如node_modules</p>
+<h3 id="gitignore"><a href="#gitignore" class="headerlink" title=".gitignore"></a>.gitignore</h3><p>在这可以配置一些文件，使其不被 git 监控，比如 node_modules</p>
 <blockquote>
 <ul>
-<li>在当前文件使用ctrl+shift+P唤出命令面板，调用 Add gitignore 命令可以把当前文件加入ignore中</li>
-<li>此外除了gitignore外 还有其他的ignore文件比如.eslintignore 起的作用都是一样的，让程序忽略掉某些文件执行</li>
+<li>在当前文件使用 ctrl+shift+P 唤出命令面板，调用 Add gitignore 命令可以把当前文件加入 ignore 中</li>
+<li>此外除了 gitignore 外 还有其他的 ignore 文件比如.eslintignore 起的作用都是一样的，让程序忽略掉某些文件执行</li>
 </ul>
 </blockquote>
 <h3 id="editorconfig"><a href="#editorconfig" class="headerlink" title=".editorconfig"></a>.editorconfig</h3><p>使用这个文件，可以让我们的项目保持一定的代码风格（比如缩进、LF&amp;CRLF）<br>这是一份示例，在不同的浏览器中可以统一代码的风格</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root = true</span><br><span class="line"></span><br><span class="line">[*]</span><br><span class="line">indent_style = space</span><br><span class="line">indent_size = 2</span><br><span class="line">charset = utf-8</span><br><span class="line">trim_trailing_whitespace = false</span><br><span class="line">insert_final_newline = false</span><br><span class="line">end_of_line = unset</span><br></pre></td></tr></table></figure>
 
-<h3 id="npmrc"><a href="#npmrc" class="headerlink" title=".npmrc"></a>.npmrc</h3><p>由于某些不可抗之力，国内无论是访问 github 还是下载 npm 包都八是很行。对于国内用户而言，首先我们要做的一件事就是将 npm 源设置淘宝源或者使用verdaccio搭建npm私有源。一般都是使用nrm管理。.npmrc 就是给 npm 用的配置文件，当然你如果使用 yarn，yarn 也会遵守 .npmrc 配置，虽然 yarn 有专门的配置文件 .yarnrc。<br>我们知道有些 npm 包在安装时是需要下载一些二进制依赖文件，其中有几个坑货像 node-sass，electron，bcrypt 还需要配置代理才能下载。为了让让别人合作开发项目的时候能顺利安装它们，我们可以在 .npmrc 中直接设置它们的镜像地址，添加 node-sass 的镜像地址：</p>
+<h3 id="npmrc"><a href="#npmrc" class="headerlink" title=".npmrc"></a>.npmrc</h3><p>由于某些不可抗之力，国内无论是访问 github 还是下载 npm 包都八是很行。对于国内用户而言，首先我们要做的一件事就是将 npm 源设置淘宝源或者使用 verdaccio 搭建 npm 私有源。一般都是使用 nrm 管理。.npmrc 就是给 npm 用的配置文件，当然你如果使用 yarn，yarn 也会遵守 .npmrc 配置，虽然 yarn 有专门的配置文件 .yarnrc。<br>我们知道有些 npm 包在安装时是需要下载一些二进制依赖文件，其中有几个坑货像 node-sass，electron，bcrypt 还需要配置代理才能下载。为了让让别人合作开发项目的时候能顺利安装它们，我们可以在 .npmrc 中直接设置它们的镜像地址，添加 node-sass 的镜像地址：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># .npmrc</span><br><span class="line">SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass</span><br></pre></td></tr></table></figure>
 
-<h3 id="LICENSE"><a href="#LICENSE" class="headerlink" title="LICENSE"></a>LICENSE</h3><p>我们可以从<a href="http://choosealicense.online/" target="_blank" rel="noopener">这个网站</a>中获取一些关于协议的信息，然后复制到我们的项目中根目录的LICENSE文件中。只需要修改其中的年份和作者名即可。</p>
-<h3 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h3><p>最核心的配置文件，在这个配置文件中我们可以配置一些项目的名称、依赖、author等<br>初始化是</p>
+<h3 id="LICENSE"><a href="#LICENSE" class="headerlink" title="LICENSE"></a>LICENSE</h3><p>我们可以从<a href="http://choosealicense.online/" target="_blank" rel="noopener">这个网站</a>中获取一些关于协议的信息，然后复制到我们的项目中根目录的 LICENSE 文件中。只需要修改其中的年份和作者名即可。</p>
+<h3 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h3><p>最核心的配置文件，在这个配置文件中我们可以配置一些项目的名称、依赖、author 等<br>初始化是</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 生成一个默认的配置文件</span><br><span class="line">npm init -y</span><br><span class="line">yarn init -y</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>scripts是npm提供给我们运行shell命令的入口,在这个配置项中我们可以配置一些命令来对项目进行某些操作，使用最多的就是npm run dev = =</li>
-<li>dependencies与devDependencies看起来差不多，他们都是标注项目的依赖列表不同的是，dependencies是项目运行时必要依赖，而devDependencies是项目开发时所需依赖。</li>
-<li>dependencies与devDependencies可以使用很多写法来表明依赖的版本，以下是npm官方给出的例子<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"foo"</span>: <span class="string">"1.0.0 - 2.9999.9999"</span>,</span><br><span class="line">    <span class="attr">"bar"</span>: <span class="string">"&gt;=1.0.2 &lt;2.1.2"</span>,</span><br><span class="line">    <span class="attr">"baz"</span>: <span class="string">"&gt;1.0.2 &lt;=2.3.4"</span>,</span><br><span class="line">    <span class="attr">"boo"</span>: <span class="string">"2.0.1"</span>,</span><br><span class="line">    <span class="attr">"qux"</span>: <span class="string">"&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0"</span>,</span><br><span class="line">    <span class="attr">"asd"</span>: <span class="string">"http://asdf.com/asdf.tar.gz"</span>,</span><br><span class="line">    <span class="attr">"til"</span>: <span class="string">"~1.2"</span>,</span><br><span class="line">    <span class="attr">"elf"</span>: <span class="string">"~1.2.3"</span>,</span><br><span class="line">    <span class="attr">"two"</span>: <span class="string">"2.x"</span>,</span><br><span class="line">    <span class="attr">"thr"</span>: <span class="string">"3.3.x"</span>,</span><br><span class="line">    <span class="attr">"lat"</span>: <span class="string">"latest"</span>,</span><br><span class="line">    <span class="attr">"dyl"</span>: <span class="string">"file:../dyl"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-大体上分为三种</li>
+<li>scripts 是 npm 提供给我们运行 shell 命令的入口,在这个配置项中我们可以配置一些命令来对项目进行某些操作，使用最多的就是 npm run dev = =</li>
+<li>dependencies 与 devDependencies 看起来差不多，他们都是标注项目的依赖列表不同的是，dependencies 是项目运行时必要依赖，而 devDependencies 是项目开发时所需依赖。</li>
+<li>dependencies 与 devDependencies 可以使用很多写法来表明依赖的版本，以下是 npm 官方给出的例子</li>
 </ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"foo"</span>: <span class="string">"1.0.0 - 2.9999.9999"</span>,</span><br><span class="line">    <span class="attr">"bar"</span>: <span class="string">"&gt;=1.0.2 &lt;2.1.2"</span>,</span><br><span class="line">    <span class="attr">"baz"</span>: <span class="string">"&gt;1.0.2 &lt;=2.3.4"</span>,</span><br><span class="line">    <span class="attr">"boo"</span>: <span class="string">"2.0.1"</span>,</span><br><span class="line">    <span class="attr">"qux"</span>: <span class="string">"&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0"</span>,</span><br><span class="line">    <span class="attr">"asd"</span>: <span class="string">"http://asdf.com/asdf.tar.gz"</span>,</span><br><span class="line">    <span class="attr">"til"</span>: <span class="string">"~1.2"</span>,</span><br><span class="line">    <span class="attr">"elf"</span>: <span class="string">"~1.2.3"</span>,</span><br><span class="line">    <span class="attr">"two"</span>: <span class="string">"2.x"</span>,</span><br><span class="line">    <span class="attr">"thr"</span>: <span class="string">"3.3.x"</span>,</span><br><span class="line">    <span class="attr">"lat"</span>: <span class="string">"latest"</span>,</span><br><span class="line">    <span class="attr">"dyl"</span>: <span class="string">"file:../dyl"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大体上分为三种</p>
 <ol>
 <li>明确版本号，即 “1.0.0”</li>
 <li>版本号区间，有多种写法，支持比较表达式以及或运算，即 “&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0”</li>
 <li>模糊匹配，其中模糊匹配分为：<ul>
-<li>2.x 会匹配所有2.0.0到3.0.0之间的版本，比如2.x会匹配2.0.0 和 2.3.5，但不包括3.0.0</li>
-<li>会匹配最近的小版本依赖包，比如~1.1.3会匹配所有1.1.x版本，但是不包括1.1.0</li>
-<li>会匹配最新的大版本依赖包，比如^2.2.2会匹配所有2.x.x的包，包括2.3.0，但是不包括3.0.0</li>
+<li>2.x 会匹配所有 2.0.0 到 3.0.0 之间的版本，比如 2.x 会匹配 2.0.0 和 2.3.5，但不包括 3.0.0</li>
+<li>会匹配最近的小版本依赖包，比如~1.1.3 会匹配所有 1.1.x 版本，但是不包括 1.1.0</li>
+<li>会匹配最新的大版本依赖包，比如^2.2.2 会匹配所有 2.x.x 的包，包括 2.3.0，但是不包括 3.0.0</li>
 <li>会匹配所有版本</li>
 <li>会匹配所有版本</li>
-<li>latest 会匹配一个给定的特殊tag版本</li>
-<li>http 或者 git 路径 会匹配给定url地址（git, git+ssh, git+http, git+https, git+file.）</li>
+<li>latest 会匹配一个给定的特殊 tag 版本</li>
+<li>http 或者 git 路径 会匹配给定 url 地址（git, git+ssh, git+http, git+https, git+file.）</li>
 <li>本地路径会匹配本地文件包，不过此路径使用需要先初始化本地依赖包</li>
 </ul>
 </li>
 </ol>
 <h3 id="travis-yml"><a href="#travis-yml" class="headerlink" title=".travis.yml"></a>.travis.yml</h3><p>我选择使用最流行的开源 CI 工具 travis CI，在 github 上新建完仓库后就可以去 travis CI 官网，先同步 github 账号信息，然后搜索激活新建的仓库。<br>在项目根目录新建 .travis.yml 文件，加入以下内容：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span> <span class="string">test</span></span><br></pre></td></tr></table></figure>
+
 <p>非常简单的配置，只是负责自动化测试。因为目前没有测试，我们添加一个 echo 语句到 npm scripts 里面：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json</span></span><br><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"test"</span>: <span class="string">"echo 'skip test...'"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="README-md"><a href="#README-md" class="headerlink" title="README.md"></a>README.md</h3><p>README.md 就是项目的说明书，每个文件夹中的 README.md 在 github 上都会被渲染到页面上。我们在项目根目录添加的 README.md 自然就会被渲染到仓库的首页。</p>
 <p>我们添加一些实用的 badges（徽章），例如 travis CI 的 build 状态，dependencies 版本是否过期等 。badge 本质上就是一个链接，只不过文字部分换成了 svg 渲染的图片，我们可以在网站 <a href="https://shields.io/" target="_blank" rel="noopener">shields.io</a> 上找到各种各样的 badge，平时逛 github 项目的时候看到喜欢的 badge 可用注意收藏一下。<br>例如：<a href="https://circleci.com/gh/ant-design/ant-design" target="_blank" rel="noopener"><img src="https://img.shields.io/circleci/project/github/ant-design/ant-design/master.svg?style=flat-square" alt="CircleCI branch"></a> <img src="https://github.com/ant-design/ant-design/workflows/test/badge.svg" alt="CI Status"> <a href="https://codecov.io/gh/ant-design/ant-design/branch/master" target="_blank" rel="noopener"><img src="https://img.shields.io/codecov/c/github/ant-design/ant-design/master.svg?style=flat-square" alt="Codecov"></a> <a href="https://www.npmjs.com/package/antd" target="_blank" rel="noopener"><img src="https://flat.badgen.net/npm/v/antd?icon=npm" alt=""></a></p>
-<p>还有一些其他的dot file具体使用就要看对应的文档了，这是搭建项目的第一步，接下来会继续更新…</p>
+<p>还有一些其他的 dot file 具体使用就要看对应的文档了，这是搭建项目的第一步，接下来会继续更新…</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck9ijzfwp0003c0jf7l4u1vwi" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckacle9aw0001bcjfbp6r1c9l" class="article-share-link">分享</a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
     </footer>
   </div>
   

@@ -65,6 +65,121 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-常见问题代码分析与重构要点总结" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" class="article-date">
+  <time datetime="2020-05-18T10:26:18.000Z" itemprop="datePublished">2020-05-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/">常见问题代码分析与重构要点</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>最近在搞后端重构的前端支持，改动涉及到了其他组的代码，看到了一些难以理解难以维护的代码，加上之前面试这边的代码，一些例子还是比较典型的，这篇博客就记录一下，同时总结一下碰到这类代码应该怎么处理、如何去小规模的重构烂代码。</p>
+<h2 id="常见问题代码"><a href="#常见问题代码" class="headerlink" title="常见问题代码"></a>常见问题代码</h2><p>一般来说，代码是写给开发者看的，而不是给机器看的</p>
+<h3 id="神奇的数字、字符串"><a href="#神奇的数字、字符串" class="headerlink" title="神奇的数字、字符串"></a>神奇的数字、字符串</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.props.source === <span class="string">"shl"</span>) &#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> i = <span class="number">11</span>;</span><br><span class="line"><span class="keyword">while</span> (i &lt;= <span class="number">82</span>) &#123;</span><br><span class="line">  obj[i * <span class="number">10000</span>] = <span class="number">0</span>;</span><br><span class="line">  i++;</span><br><span class="line">&#125;</span><br><span class="line">&lt;div className=&#123;styles.warpper&#125;&gt;</span><br><span class="line">  &#123;currentIndex === <span class="number">1</span> &amp;&amp; [elements[<span class="number">0</span>], elements[<span class="number">1</span>]]&#125;</span><br><span class="line">  &#123;currentIndex === <span class="number">-1</span> &amp;&amp; [elements[<span class="number">2</span>], elements[<span class="number">3</span>]]&#125;</span><br><span class="line">&lt;<span class="regexp">/div&gt;;</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，开发者在开发的时候可能会很爽，但是其他人在维护的时候可能就会产生疑惑： 不知道 shl 、currentIndex、elements[0]代表的是什么意思，搞不懂也不知道为什么是它。</p>
+<p>这种情况我们可以将用到的常量提取出来，比如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 测评类型集合</span></span><br><span class="line"><span class="keyword">const</span> SOURCE_TYPE = &#123;</span><br><span class="line">  SHL: <span class="string">'shl'</span>,</span><br><span class="line">  PI: <span class="string">'pi'</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.props.source === SOURCE_TYPE.SHL) &#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 申请表页码</span></span><br><span class="line"><span class="keyword">const</span> APPLY_FORM_PAGE = &#123;</span><br><span class="line">  PREV: <span class="number">1</span>,</span><br><span class="line">  NEXT: <span class="number">-1</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">const</span> [interviews, application, candidate, source] = elements</span><br><span class="line">&lt;div className=&#123;styles.warpper&#125;&gt;</span><br><span class="line">  &#123;currentIndex === APPLY_FORM_PAGE.PREV &amp;&amp; [interviews, application]&#125;</span><br><span class="line">  &#123;currentIndex === APPLY_FORM_PAGE.NEXT &amp;&amp; [candidate, source]&#125;</span><br><span class="line">&lt;<span class="regexp">/div&gt;;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样其他开发者就会明白：在前一页展示面试和申请信息，在后一页展示候选人信息</p>
+<p>在大多数情况下，声明的值很有可能在其他地方复用。因此，通过声明变量的形式，可以减少代码重复，并且易于维护。</p>
+<h3 id="不明意义的命名"><a href="#不明意义的命名" class="headerlink" title="不明意义的命名"></a>不明意义的命名</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="keyword">const</span> g1 = groups1[i];</span><br><span class="line"><span class="keyword">const</span> g2 = groups2[i];</span><br><span class="line"><span class="keyword">const</span> ci = candidates[i];</span><br><span class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">arraysEqual</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (a === b) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种命名方法不能说错，但是会让别人感觉到不专业，这个人不行，说不定心里还会默念一句 xx 还是尽量的按照语意翻译下变量。</p>
+<h3 id="逻辑冗余-不紧凑"><a href="#逻辑冗余-不紧凑" class="headerlink" title="逻辑冗余(不紧凑)"></a>逻辑冗余(不紧凑)</h3><p>这种现象一般出现在多人修改过的代码中</p>
+<ul>
+<li>第一种：</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="keyword">const</span> query = <span class="built_in">Object</span>.keys(search)</span><br><span class="line">  .filter(<span class="function">(<span class="params">key</span>) =&gt;</span> !!search[key])</span><br><span class="line">  .map(<span class="function">(<span class="params">key</span>) =&gt;</span> key + <span class="string">"="</span> + search[key])</span><br><span class="line">  .join(<span class="string">"&amp;"</span>);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="keyword">let</span> interviews = <span class="keyword">this</span>.props.interviews;</span><br><span class="line">interviews = interviews.filter(<span class="function">(<span class="params">item</span>) =&gt;</span> item.interviewer.length &gt; <span class="number">0</span>);</span><br><span class="line"><span class="keyword">const</span> interviewIds = interviews.map(<span class="function">(<span class="params">el</span>) =&gt;</span> el.id);</span><br><span class="line"><span class="comment">// ...code</span></span><br></pre></td></tr></table></figure>
+
+<p>filter 之后又 map 然后再搞点其他操作，在产品逻辑频繁变动的时候很容易出现这种代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// good</span></span><br><span class="line"><span class="keyword">const</span> query = <span class="built_in">Object</span>.entries(search).reduce(</span><br><span class="line">  (acc, [key, value], index, list) =&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> !!search[key]</span><br><span class="line">      ? <span class="string">`<span class="subst">$&#123;acc&#125;</span><span class="subst">$&#123;key&#125;</span>=<span class="subst">$&#123;value&#125;</span><span class="subst">$&#123;index === list.length ? <span class="string">""</span> : <span class="string">"&amp;"</span>&#125;</span>`</span></span><br><span class="line">      : acc;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">""</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第二种</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// bad</span></span><br><span class="line"><span class="keyword">const</span> getJobRank = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">  <span class="keyword">return</span> (</span><br><span class="line">    jobRank1.name.split(<span class="string">""</span>).reduce(<span class="function">(<span class="params">sum, i</span>) =&gt;</span> i.charCodeAt() + sum, <span class="number">0</span>) -</span><br><span class="line">    jobRank2.name.split(<span class="string">""</span>).reduce(<span class="function">(<span class="params">sum, i</span>) =&gt;</span> i.charCodeAt() + sum, <span class="number">0</span>)</span><br><span class="line">  );</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这种情况是开发者偷懒,可以封装成一个方法的代码复制了一份，会让后来维护这段代码的人产生疑惑</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// good</span></span><br><span class="line"><span class="keyword">const</span> getJobRankName = <span class="function">(<span class="params">jobRank</span>) =&gt;</span></span><br><span class="line">  jobRank.name.split(<span class="string">""</span>).reduce(<span class="function">(<span class="params">sum, i</span>) =&gt;</span> i.charCodeAt() + sum, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">const</span> getJobRank = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">  <span class="keyword">return</span> getJobRankName(jobRank1) - getJobRankName(jobRank2);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>逻辑冗余(不紧凑)的情况需要开发者自觉的去小重构了。</p>
+<h3 id="复杂的-render-方法"><a href="#复杂的-render-方法" class="headerlink" title="复杂的 render 方法"></a>复杂的 render 方法</h3><p>在 render 方法中进行过多的逻辑判断、在 render 中定义 function、过长的 dom 结构都是导致整个组件难以维护的原因</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Example</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> getInterviews = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// ... 200行代码</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">// 十几行确定一个变量</span></span><br><span class="line">    <span class="keyword">const</span> isActive = xxx;</span><br><span class="line">    <span class="comment">// tips: 两个return之间的代码差距非常小</span></span><br><span class="line">    <span class="keyword">if</span> (isExtendInterviewFeedback) &#123;</span><br><span class="line">      <span class="keyword">return</span> (</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">          &#123;</span><br><span class="line">            <span class="comment">// ... 400行dom</span></span><br><span class="line">          &#125;</span><br><span class="line">        &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">      );</span></span><br><span class="line"><span class="regexp">    &#125; else &#123;</span></span><br><span class="line"><span class="regexp">      return (</span></span><br><span class="line"><span class="regexp">        &lt;div&gt;</span></span><br><span class="line"><span class="regexp">          &#123;</span></span><br><span class="line"><span class="regexp">            /</span><span class="regexp">/ ... 500行dom</span></span><br><span class="line"><span class="regexp">          &#125;</span></span><br><span class="line"><span class="regexp">        &lt;/</span>div&gt;</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>出现这种情况也可能是一代目开发者图快直接写了一大堆代码，后来安排了另一个人加功能的时候无从下手，只好复制了一份<br>所以开发者在写 render 方法的时候尽量把一些独立的组织、模块拆开来写成单独的方法或者 component，然后就像积木一样组织父子关系，再加上更加语意化的命名，就不会被后来接盘代码的人骂了。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Example</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="comment">// ...code</span></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123;</span><br><span class="line">      candidateList,</span><br><span class="line">      feedbackTemplate,</span><br><span class="line">      templateEntities,</span><br><span class="line">      padding,</span><br><span class="line">      submitFailedApplicationIds,</span><br><span class="line">    &#125; = <span class="keyword">this</span>.state;</span><br><span class="line">    <span class="keyword">const</span> &#123; interviewFeedbackSetting &#125; = <span class="keyword">this</span>.props;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;Wrapper&gt;</span><br><span class="line">        &lt;Header</span><br><span class="line">          candidateList=&#123;candidateList&#125;</span><br><span class="line">          cancel=&#123;<span class="keyword">this</span>.cancelWithSaveTemplateEntities&#125;</span><br><span class="line">        /&gt;</span><br><span class="line">        &lt;Main</span><br><span class="line">          onRef=&#123;(ref) =&gt; (<span class="keyword">this</span>.mainRef = ref)&#125;</span><br><span class="line">          padding=&#123;padding&#125;</span><br><span class="line">          feedbackResultOptions=&#123;<span class="keyword">this</span>.feedbackResultOptions&#125;</span><br><span class="line">          feedbackTemplateItems=&#123;feedbackTemplate.items&#125;</span><br><span class="line">          changeFeedbackResult=&#123;<span class="keyword">this</span>.changeFeedbackResult&#125;</span><br><span class="line">          interviewFeedbackSetting=&#123;interviewFeedbackSetting&#125;</span><br><span class="line">          submitFailedApplicationIds=&#123;submitFailedApplicationIds&#125;</span><br><span class="line">        /&gt;</span><br><span class="line">        &lt;BottomBar</span><br><span class="line">          padding=&#123;padding&#125;</span><br><span class="line">          submit=&#123;<span class="keyword">this</span>.submit&#125;</span><br><span class="line">          cancel=&#123;<span class="keyword">this</span>.cancel&#125;</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;<span class="regexp">/Wrapper&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂的条件判断"><a href="#复杂的条件判断" class="headerlink" title="复杂的条件判断"></a>复杂的条件判断</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> locationOptions = [];</span><br><span class="line">locationOptions = <span class="function">(<span class="params">locations || []</span>).<span class="params">filter</span>(<span class="params">(location</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (condition1) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (condition2 &amp;&amp; condition3) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (condition4 || condition5) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 好多条件</span></span><br><span class="line">  <span class="keyword">if</span> (locationType) &#123;</span><br><span class="line">    <span class="keyword">return</span> location.type === locationType;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这种代码虽然复杂，但是好像并没有特别好的解决方法，先标记一下，可以的做法是把这种恶心人的逻辑拿出去，做成一个单独的方法,比如叫 <code>getAvalibleLocationOption</code>,这样也比放在 render 中好得多</p>
+<h2 id="碰到这些代码应该怎么办"><a href="#碰到这些代码应该怎么办" class="headerlink" title="碰到这些代码应该怎么办"></a>碰到这些代码应该怎么办</h2><p>首先先调整好心态，憋着不要骂人。然后分析一下代码逻辑，太大的模块就先不要搞了，记一个 jira，小模块的话可以进行小规模的重构，虽然大规模的重构十分不可控，但是小重构可以使得代码质量好转，而且后来的开发者看到 git 记录 也会竖个大拇指给你，勇士</p>
+<p><a href="https://gitlab.mokahr.com/ats-client/mage-hm-mobile-client/commit/8749c3605a7e3de20a297fe14fd1ee9416a3b0d6" target="_blank" rel="noopener">MobileTab</a></p>
+<h2 id="如何去重构（提升可维护性）"><a href="#如何去重构（提升可维护性）" class="headerlink" title="如何去重构（提升可维护性）"></a>如何去重构（提升可维护性）</h2><ul>
+<li><p>重构并不是一次性的，代码实在是烂的没法改了，或者没什么新的需求了，就召集一帮人专门拿出来一段时间做重构，这其实是错误的做法，首先很多创业公司讲究快速迭代，如果要做大型重构，会占用很多开发资源，这个基本上很难实现，再就是重构的收益不是很好量化，对于公司层面可能看不到什么收益。</p>
+</li>
+<li><p>如果放弃重构，或者没有有计划的去小规模重构，就会导致代码质量自然下降直到工程的生命周期结束，最后不得不推倒重来，所以要有计划的进行小的模块重构</p>
+</li>
+</ul>
+<h3 id="单一模块重构"><a href="#单一模块重构" class="headerlink" title="单一模块重构"></a>单一模块重构</h3><p>重构的点是：</p>
+<ul>
+<li>变量重命名/函数重命名</li>
+<li>提取内部公共函数/内部公共常量</li>
+<li>提取变量</li>
+</ul>
+<p>单一模块重构目的是把模块内部的逻辑梳理清楚，并且把一个巨大无比的函数拆分成可维护的小块代码。这类重构的特点是修改基本集中在一个地方，对代码逻辑的修改很少并且基本可控没有什么风险。非业务代码的话可以补充一些单元测试保证代码可靠性</p>
+<h3 id="多个模块重构"><a href="#多个模块重构" class="headerlink" title="多个模块重构"></a>多个模块重构</h3><p>涉及到多个模块重构的时候，需要提前规划好需要修改哪些地方</p>
+<ul>
+<li>控制重构范围</li>
+<li>代码解耦合</li>
+<li>删除无用代码</li>
+<li>移动函数到正确的地方</li>
+<li>提取公共函数到公共文件</li>
+<li>修改函数逻辑/简化代码</li>
+</ul>
+<h3 id="工程基本的重构"><a href="#工程基本的重构" class="headerlink" title="工程基本的重构"></a>工程基本的重构</h3><p>此类重构就只能单独排期了</p>
+<ul>
+<li>修改文件结构</li>
+<li>升级 webpack、babel。升级 react 版本，更新 webpack 插件</li>
+</ul>
+<p>同时需要完善回滚机制，万一出了问题及时回滚</p>
+<p>展开说的话内容太多了，而且也是在不断学习中，就先记了以上几个点</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" data-id="ckacle9b7000fbcjfa46gfshp" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-业务开发过程中一些事情关于多人协作的记录" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" class="article-date">
@@ -143,7 +258,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ck9ijzfwt0008c0jf11th4mav" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ckacle9b00004bcjf1d3k0xym" class="article-share-link">分享</a>
       
       
       
@@ -206,7 +321,7 @@
 </ol>
 </blockquote>
 <p>执行完 init 之后 就会生成一个 eslint 配置文件.eslintrc.js</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    es6: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  extends: [<span class="string">"plugin:react/recommended"</span>, <span class="string">"airbnb"</span>],</span><br><span class="line">  globals: &#123;</span><br><span class="line">    Atomics: <span class="string">"readonly"</span>,</span><br><span class="line">    SharedArrayBuffer: <span class="string">"readonly"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  parser: <span class="string">"@typescript-eslint/parser"</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    ecmaFeatures: &#123;</span><br><span class="line">      jsx: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    ecmaVersion: <span class="number">2018</span>,</span><br><span class="line">    sourceType: <span class="string">"module"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [<span class="string">"react"</span>, <span class="string">"@typescript-eslint"</span>],</span><br><span class="line">  rules: &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  env: &#123;</span><br><span class="line">    browser: <span class="literal">true</span>,</span><br><span class="line">    es6: <span class="literal">true</span>,</span><br><span class="line">    node: <span class="literal">true</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  extends: [<span class="string">'plugin:react/recommended'</span>, <span class="string">'airbnb'</span>],</span><br><span class="line">  globals: &#123;</span><br><span class="line">    Atomics: <span class="string">'readonly'</span>,</span><br><span class="line">    SharedArrayBuffer: <span class="string">'readonly'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  parser: <span class="string">'@typescript-eslint/parser'</span>,</span><br><span class="line">  parserOptions: &#123;</span><br><span class="line">    ecmaFeatures: &#123;</span><br><span class="line">      jsx: <span class="literal">true</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    ecmaVersion: <span class="number">2018</span>,</span><br><span class="line">    sourceType: <span class="string">'module'</span>,</span><br><span class="line">  &#125;,</span><br><span class="line">  plugins: [<span class="string">'react'</span>, <span class="string">'@typescript-eslint'</span>],</span><br><span class="line">  rules: &#123;&#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>可以看到 TypeScript 的主要 parser 是 <code>@typescript-eslint/parser</code> 这跟普通的 js 项目的 parser 不同，同时在默认配置加入了<code>@typescript-eslint</code>来更好的支持 TypeScript</p>
 <p>以下是一些注意的点：</p>
@@ -268,7 +383,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ck9ijzfwm0001c0jfduvhh6i5" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckacle9b10005bcjf7hhs5mqz" class="article-share-link">分享</a>
       
       
       
@@ -284,8 +399,8 @@
   
     <article id="post-从零创建一个项目要做的工作（一）" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
-  <time datetime="2020-02-23T14:41:33.734Z" itemprop="datePublished">2020-02-23</time>
+    <a href="/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" class="article-date">
+  <time datetime="2020-02-24T14:41:33.000Z" itemprop="datePublished">2020-02-24</time>
 </a>
     
   </div>
@@ -296,7 +411,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
+      <a class="article-title" href="/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
     </h1>
   
 
@@ -306,10 +421,7 @@
       
         <!-- Table of Contents -->
         
-        <hr>
-<p>title: 从零创建一个项目要做的工作（一）<br>date: 2020-02-23 22:41:33<br>tags: JavaScript</p>
-<hr>
-<p>整理一下从零创建一个项目需要的工作内容，大体分为以下几点：</p>
+        <p>整理一下从零创建一个项目需要的工作内容，大体分为以下几点：</p>
 <ol>
 <li>dot files</li>
 <li>linter formatter</li>
@@ -319,7 +431,6 @@
 </ol>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir my-project</span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$_</span></span><br><span class="line">git init</span><br></pre></td></tr></table></figure>
 
-
 <h2 id="1-dot-files"><a href="#1-dot-files" class="headerlink" title="1.dot files"></a>1.dot files</h2><p>就是一些.开头的文件，大部分是一些配置文件。这些文件可以让协作开发的时候保持统一的风格，一般前端经常用到的是：</p>
 <ul>
 <li>.gitignore</li>
@@ -328,62 +439,69 @@
 <li>.npmrc</li>
 <li>LICENSE</li>
 <li>package.json</li>
-<li>settings.json（vsCode专属）</li>
+<li>settings.json（vsCode 专属）</li>
 <li>README.md</li>
 </ul>
 <p>等等</p>
-<h3 id="gitignore"><a href="#gitignore" class="headerlink" title=".gitignore"></a>.gitignore</h3><p>在这可以配置一些文件，使其不被git监控，比如node_modules</p>
+<h3 id="gitignore"><a href="#gitignore" class="headerlink" title=".gitignore"></a>.gitignore</h3><p>在这可以配置一些文件，使其不被 git 监控，比如 node_modules</p>
 <blockquote>
 <ul>
-<li>在当前文件使用ctrl+shift+P唤出命令面板，调用 Add gitignore 命令可以把当前文件加入ignore中</li>
-<li>此外除了gitignore外 还有其他的ignore文件比如.eslintignore 起的作用都是一样的，让程序忽略掉某些文件执行</li>
+<li>在当前文件使用 ctrl+shift+P 唤出命令面板，调用 Add gitignore 命令可以把当前文件加入 ignore 中</li>
+<li>此外除了 gitignore 外 还有其他的 ignore 文件比如.eslintignore 起的作用都是一样的，让程序忽略掉某些文件执行</li>
 </ul>
 </blockquote>
 <h3 id="editorconfig"><a href="#editorconfig" class="headerlink" title=".editorconfig"></a>.editorconfig</h3><p>使用这个文件，可以让我们的项目保持一定的代码风格（比如缩进、LF&amp;CRLF）<br>这是一份示例，在不同的浏览器中可以统一代码的风格</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root = true</span><br><span class="line"></span><br><span class="line">[*]</span><br><span class="line">indent_style = space</span><br><span class="line">indent_size = 2</span><br><span class="line">charset = utf-8</span><br><span class="line">trim_trailing_whitespace = false</span><br><span class="line">insert_final_newline = false</span><br><span class="line">end_of_line = unset</span><br></pre></td></tr></table></figure>
 
-<h3 id="npmrc"><a href="#npmrc" class="headerlink" title=".npmrc"></a>.npmrc</h3><p>由于某些不可抗之力，国内无论是访问 github 还是下载 npm 包都八是很行。对于国内用户而言，首先我们要做的一件事就是将 npm 源设置淘宝源或者使用verdaccio搭建npm私有源。一般都是使用nrm管理。.npmrc 就是给 npm 用的配置文件，当然你如果使用 yarn，yarn 也会遵守 .npmrc 配置，虽然 yarn 有专门的配置文件 .yarnrc。<br>我们知道有些 npm 包在安装时是需要下载一些二进制依赖文件，其中有几个坑货像 node-sass，electron，bcrypt 还需要配置代理才能下载。为了让让别人合作开发项目的时候能顺利安装它们，我们可以在 .npmrc 中直接设置它们的镜像地址，添加 node-sass 的镜像地址：</p>
+<h3 id="npmrc"><a href="#npmrc" class="headerlink" title=".npmrc"></a>.npmrc</h3><p>由于某些不可抗之力，国内无论是访问 github 还是下载 npm 包都八是很行。对于国内用户而言，首先我们要做的一件事就是将 npm 源设置淘宝源或者使用 verdaccio 搭建 npm 私有源。一般都是使用 nrm 管理。.npmrc 就是给 npm 用的配置文件，当然你如果使用 yarn，yarn 也会遵守 .npmrc 配置，虽然 yarn 有专门的配置文件 .yarnrc。<br>我们知道有些 npm 包在安装时是需要下载一些二进制依赖文件，其中有几个坑货像 node-sass，electron，bcrypt 还需要配置代理才能下载。为了让让别人合作开发项目的时候能顺利安装它们，我们可以在 .npmrc 中直接设置它们的镜像地址，添加 node-sass 的镜像地址：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># .npmrc</span><br><span class="line">SASS_BINARY_SITE=http://npm.taobao.org/mirrors/node-sass</span><br></pre></td></tr></table></figure>
 
-<h3 id="LICENSE"><a href="#LICENSE" class="headerlink" title="LICENSE"></a>LICENSE</h3><p>我们可以从<a href="http://choosealicense.online/" target="_blank" rel="noopener">这个网站</a>中获取一些关于协议的信息，然后复制到我们的项目中根目录的LICENSE文件中。只需要修改其中的年份和作者名即可。</p>
-<h3 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h3><p>最核心的配置文件，在这个配置文件中我们可以配置一些项目的名称、依赖、author等<br>初始化是</p>
+<h3 id="LICENSE"><a href="#LICENSE" class="headerlink" title="LICENSE"></a>LICENSE</h3><p>我们可以从<a href="http://choosealicense.online/" target="_blank" rel="noopener">这个网站</a>中获取一些关于协议的信息，然后复制到我们的项目中根目录的 LICENSE 文件中。只需要修改其中的年份和作者名即可。</p>
+<h3 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h3><p>最核心的配置文件，在这个配置文件中我们可以配置一些项目的名称、依赖、author 等<br>初始化是</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># 生成一个默认的配置文件</span><br><span class="line">npm init -y</span><br><span class="line">yarn init -y</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>scripts是npm提供给我们运行shell命令的入口,在这个配置项中我们可以配置一些命令来对项目进行某些操作，使用最多的就是npm run dev = =</li>
-<li>dependencies与devDependencies看起来差不多，他们都是标注项目的依赖列表不同的是，dependencies是项目运行时必要依赖，而devDependencies是项目开发时所需依赖。</li>
-<li>dependencies与devDependencies可以使用很多写法来表明依赖的版本，以下是npm官方给出的例子<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"foo"</span>: <span class="string">"1.0.0 - 2.9999.9999"</span>,</span><br><span class="line">    <span class="attr">"bar"</span>: <span class="string">"&gt;=1.0.2 &lt;2.1.2"</span>,</span><br><span class="line">    <span class="attr">"baz"</span>: <span class="string">"&gt;1.0.2 &lt;=2.3.4"</span>,</span><br><span class="line">    <span class="attr">"boo"</span>: <span class="string">"2.0.1"</span>,</span><br><span class="line">    <span class="attr">"qux"</span>: <span class="string">"&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0"</span>,</span><br><span class="line">    <span class="attr">"asd"</span>: <span class="string">"http://asdf.com/asdf.tar.gz"</span>,</span><br><span class="line">    <span class="attr">"til"</span>: <span class="string">"~1.2"</span>,</span><br><span class="line">    <span class="attr">"elf"</span>: <span class="string">"~1.2.3"</span>,</span><br><span class="line">    <span class="attr">"two"</span>: <span class="string">"2.x"</span>,</span><br><span class="line">    <span class="attr">"thr"</span>: <span class="string">"3.3.x"</span>,</span><br><span class="line">    <span class="attr">"lat"</span>: <span class="string">"latest"</span>,</span><br><span class="line">    <span class="attr">"dyl"</span>: <span class="string">"file:../dyl"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-大体上分为三种</li>
+<li>scripts 是 npm 提供给我们运行 shell 命令的入口,在这个配置项中我们可以配置一些命令来对项目进行某些操作，使用最多的就是 npm run dev = =</li>
+<li>dependencies 与 devDependencies 看起来差不多，他们都是标注项目的依赖列表不同的是，dependencies 是项目运行时必要依赖，而 devDependencies 是项目开发时所需依赖。</li>
+<li>dependencies 与 devDependencies 可以使用很多写法来表明依赖的版本，以下是 npm 官方给出的例子</li>
 </ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="attr">"foo"</span>: <span class="string">"1.0.0 - 2.9999.9999"</span>,</span><br><span class="line">    <span class="attr">"bar"</span>: <span class="string">"&gt;=1.0.2 &lt;2.1.2"</span>,</span><br><span class="line">    <span class="attr">"baz"</span>: <span class="string">"&gt;1.0.2 &lt;=2.3.4"</span>,</span><br><span class="line">    <span class="attr">"boo"</span>: <span class="string">"2.0.1"</span>,</span><br><span class="line">    <span class="attr">"qux"</span>: <span class="string">"&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0"</span>,</span><br><span class="line">    <span class="attr">"asd"</span>: <span class="string">"http://asdf.com/asdf.tar.gz"</span>,</span><br><span class="line">    <span class="attr">"til"</span>: <span class="string">"~1.2"</span>,</span><br><span class="line">    <span class="attr">"elf"</span>: <span class="string">"~1.2.3"</span>,</span><br><span class="line">    <span class="attr">"two"</span>: <span class="string">"2.x"</span>,</span><br><span class="line">    <span class="attr">"thr"</span>: <span class="string">"3.3.x"</span>,</span><br><span class="line">    <span class="attr">"lat"</span>: <span class="string">"latest"</span>,</span><br><span class="line">    <span class="attr">"dyl"</span>: <span class="string">"file:../dyl"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大体上分为三种</p>
 <ol>
 <li>明确版本号，即 “1.0.0”</li>
 <li>版本号区间，有多种写法，支持比较表达式以及或运算，即 “&lt;1.0.0 || &gt;=2.3.1 &lt;2.4.5 || &gt;=2.5.2 &lt;3.0.0”</li>
 <li>模糊匹配，其中模糊匹配分为：<ul>
-<li>2.x 会匹配所有2.0.0到3.0.0之间的版本，比如2.x会匹配2.0.0 和 2.3.5，但不包括3.0.0</li>
-<li>会匹配最近的小版本依赖包，比如~1.1.3会匹配所有1.1.x版本，但是不包括1.1.0</li>
-<li>会匹配最新的大版本依赖包，比如^2.2.2会匹配所有2.x.x的包，包括2.3.0，但是不包括3.0.0</li>
+<li>2.x 会匹配所有 2.0.0 到 3.0.0 之间的版本，比如 2.x 会匹配 2.0.0 和 2.3.5，但不包括 3.0.0</li>
+<li>会匹配最近的小版本依赖包，比如~1.1.3 会匹配所有 1.1.x 版本，但是不包括 1.1.0</li>
+<li>会匹配最新的大版本依赖包，比如^2.2.2 会匹配所有 2.x.x 的包，包括 2.3.0，但是不包括 3.0.0</li>
 <li>会匹配所有版本</li>
 <li>会匹配所有版本</li>
-<li>latest 会匹配一个给定的特殊tag版本</li>
-<li>http 或者 git 路径 会匹配给定url地址（git, git+ssh, git+http, git+https, git+file.）</li>
+<li>latest 会匹配一个给定的特殊 tag 版本</li>
+<li>http 或者 git 路径 会匹配给定 url 地址（git, git+ssh, git+http, git+https, git+file.）</li>
 <li>本地路径会匹配本地文件包，不过此路径使用需要先初始化本地依赖包</li>
 </ul>
 </li>
 </ol>
 <h3 id="travis-yml"><a href="#travis-yml" class="headerlink" title=".travis.yml"></a>.travis.yml</h3><p>我选择使用最流行的开源 CI 工具 travis CI，在 github 上新建完仓库后就可以去 travis CI 官网，先同步 github 账号信息，然后搜索激活新建的仓库。<br>在项目根目录新建 .travis.yml 文件，加入以下内容：</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">node_js</span></span><br><span class="line"><span class="attr">cache:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span></span><br><span class="line"><span class="attr">script:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">yarn</span> <span class="string">test</span></span><br></pre></td></tr></table></figure>
+
 <p>非常简单的配置，只是负责自动化测试。因为目前没有测试，我们添加一个 echo 语句到 npm scripts 里面：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// package.json</span></span><br><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"test"</span>: <span class="string">"echo 'skip test...'"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="README-md"><a href="#README-md" class="headerlink" title="README.md"></a>README.md</h3><p>README.md 就是项目的说明书，每个文件夹中的 README.md 在 github 上都会被渲染到页面上。我们在项目根目录添加的 README.md 自然就会被渲染到仓库的首页。</p>
 <p>我们添加一些实用的 badges（徽章），例如 travis CI 的 build 状态，dependencies 版本是否过期等 。badge 本质上就是一个链接，只不过文字部分换成了 svg 渲染的图片，我们可以在网站 <a href="https://shields.io/" target="_blank" rel="noopener">shields.io</a> 上找到各种各样的 badge，平时逛 github 项目的时候看到喜欢的 badge 可用注意收藏一下。<br>例如：<a href="https://circleci.com/gh/ant-design/ant-design" target="_blank" rel="noopener"><img src="https://img.shields.io/circleci/project/github/ant-design/ant-design/master.svg?style=flat-square" alt="CircleCI branch"></a> <img src="https://github.com/ant-design/ant-design/workflows/test/badge.svg" alt="CI Status"> <a href="https://codecov.io/gh/ant-design/ant-design/branch/master" target="_blank" rel="noopener"><img src="https://img.shields.io/codecov/c/github/ant-design/ant-design/master.svg?style=flat-square" alt="Codecov"></a> <a href="https://www.npmjs.com/package/antd" target="_blank" rel="noopener"><img src="https://flat.badgen.net/npm/v/antd?icon=npm" alt=""></a></p>
-<p>还有一些其他的dot file具体使用就要看对应的文档了，这是搭建项目的第一步，接下来会继续更新…</p>
+<p>还有一些其他的 dot file 具体使用就要看对应的文档了，这是搭建项目的第一步，接下来会继续更新…</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ck9ijzfwp0003c0jf7l4u1vwi" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckacle9aw0001bcjfbp6r1c9l" class="article-share-link">分享</a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
     </footer>
   </div>
   
@@ -482,7 +600,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ck9ijzfwu000ac0jffgnzcv85" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ckacle9b6000dbcjfbu0l7f3n" class="article-share-link">分享</a>
       
       
       
@@ -572,7 +690,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ck9ijzfwr0005c0jf5vxu220l" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ckacle9b30008bcjf6wsvhoj2" class="article-share-link">分享</a>
       
       
       
@@ -667,7 +785,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ck9ijzfwv000cc0jffu0q0x2e" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ckacle9b4000abcjf4csfdwlr" class="article-share-link">分享</a>
       
       
       
@@ -734,7 +852,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ck9ijzfwq0004c0jfhijv4rk9" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ckacle9az0003bcjfccpc0bla" class="article-share-link">分享</a>
       
       
       
@@ -791,7 +909,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ck9ijzfwi0000c0jf9coc8mnl" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ckacle9at0000bcjf9y4i8qr2" class="article-share-link">分享</a>
       
       
       
@@ -854,6 +972,10 @@
       <ul>
         
           <li>
+            <a href="/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/">常见问题代码分析与重构要点</a>
+          </li>
+        
+          <li>
             <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/">业务开发过程中一些事情关于多人协作的记录</a>
           </li>
         
@@ -862,15 +984,11 @@
           </li>
         
           <li>
-            <a href="/2020/02/23/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
+            <a href="/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
           </li>
         
           <li>
             <a href="/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/">TypeScript————类型相关总结</a>
-          </li>
-        
-          <li>
-            <a href="/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/">清理项目中的无效代码</a>
           </li>
         
       </ul>
@@ -882,7 +1000,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
