@@ -5,21 +5,22 @@
   
   <title>一次爬虫的实践.md | x1eJian&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的 接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppetee">
+  <meta name="description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的：  接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppet">
 <meta name="keywords" content="JavaScript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次爬虫的实践.md">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;07&#x2F;26&#x2F;%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5&#x2F;index.html">
 <meta property="og:site_name" content="x1eJian&#39;s blog">
-<meta property="og:description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的 接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppetee">
+<meta property="og:description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的：  接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppet">
 <meta property="og:locale" content="zh">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200728005253.jpg">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20200727233849.jpg">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200727235833.jpg">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200727235846.jpg">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200728002422.jpg">
-<meta property="og:updated_time" content="2020-07-27T16:50:40.655Z">
+<meta property="og:updated_time" content="2020-07-27T16:53:55.790Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20200727233849.jpg">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200728005253.jpg">
   
     <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
   
@@ -96,7 +97,8 @@
       
         <!-- Table of Contents -->
         
-        <h1 id="一次爬虫的实践"><a href="#一次爬虫的实践" class="headerlink" title="一次爬虫的实践"></a>一次爬虫的实践</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的</p>
+        <h1 id="一次爬虫的实践"><a href="#一次爬虫的实践" class="headerlink" title="一次爬虫的实践"></a>一次爬虫的实践</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的：</p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200728005253.jpg" alt="命令行看盘"></p>
 <p>接下来就是实现的洗细节了</p>
 <h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><p>主要的两个核心依赖是：</p>
 <ul>
@@ -146,7 +148,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckd4r05190001bcjf49zj49rz" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckd4r44o50000nwjfe3hi8hs0" class="article-share-link">分享</a>
       
       
       
