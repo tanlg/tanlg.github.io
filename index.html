@@ -65,6 +65,94 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-一次爬虫的实践" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" class="article-date">
+  <time datetime="2020-07-26T13:11:49.000Z" itemprop="datePublished">2020-07-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/">一次爬虫的实践.md</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="一次爬虫的实践"><a href="#一次爬虫的实践" class="headerlink" title="一次爬虫的实践"></a>一次爬虫的实践</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的</p>
+<p>接下来就是实现的洗细节了</p>
+<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><p>主要的两个核心依赖是：</p>
+<ul>
+<li>puppeteer</li>
+<li>tty-table</li>
+</ul>
+<h3 id="puppeteer"><a href="#puppeteer" class="headerlink" title="puppeteer"></a>puppeteer</h3><p>爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看<a href="https://pptr.dev/" target="_blank" rel="noopener">这里</a>就可以了，我们可以用它来完成很多自动化的功能。</p>
+<blockquote>
+<p>Puppeteer 是一个 Node 库，它提供了高级 API 来通过 DevTools 协议控制 Chrome 或 Chromium. 我们在浏览器中手动执行的大多数操作都可以使用 Puppeteer 来自动完成</p>
+</blockquote>
+<h3 id="tty-table"><a href="#tty-table" class="headerlink" title="tty-table"></a>tty-table</h3><p>这是一个 Terminal App,大白话说就是在命令行中绘制表格的，文档点<a href="https://ttytoolkit.org/" target="_blank" rel="noopener">这里</a></p>
+<p>那么接下来就开冲吧！</p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>为了简易实现和安全性考虑，源数据都是需要手填的，就像这样</p>
+<p><img src="/image/20200727233849.jpg" alt="配置文件"></p>
+<p>做成 json 文件或者 js 文件都可以,我们需要读取设定好的变量，然后去爬取我们设置股票代码对应的数据（现价），通过计算得出我们想要的数据， 最终决定悄悄的去<a href="https://xueqiu.com/" target="_blank" rel="noopener">雪球</a>这个网站获取数据，通过分析雪球这个网站的 url 发现，在上交所上市的公司地址都是<code>https://xueqiu.com/S/SHxxxxxx</code>,在深交所上市的公司地址都是<code>https://xueqiu.com/S/SZxxxxxx</code>（注： xxxxxx 代表股票代码），如下图</p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200727235833.jpg" alt="上证指数包含的股票地址"></p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200727235846.jpg" alt="深证指数包含的股票地址"></p>
+<p>由于创业板、科创板交易门槛要求过高，这里我们就不考虑了。</p>
+<blockquote>
+<p>科普：创业板的交易门槛是对存量投资者的适当性管理要求基本保持不变，新增创业板个人投资者须满足前 20 个交易日日均资产不低于 10 万元，且具备 24 个月的 A 股交易经验的门槛；科创板的交易门槛是股票交易必 5261 须满两年、投资者在开通科创板账户之前的二十个交易日，账户必须有不低于 50 万元的流动资金</p>
+</blockquote>
+<p>查阅资料发现 股票代码 5、6 开头的股票属于沪市（6 为股票、5 为 ETF 基金），那么我们就可以得出爬虫获取 url 的方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getUrlByCode = <span class="function">(<span class="params">code = <span class="string">''</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!code) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Invalid code'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> tag = [<span class="string">'5'</span>, <span class="string">'6'</span>].includes(code[<span class="number">0</span>]) ? <span class="string">'SH'</span> : <span class="string">'SZ'</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`https://xueqiu.com/S/<span class="subst">$&#123;tag&#125;</span><span class="subst">$&#123;code&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>拿到链接之后就可以通过 puppeteer 来获取数据了</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每一个code都会被映射成一个page 最终存储到一个pages数组里</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> browser = <span class="keyword">await</span> puppeteer.launch(&#123;</span><br><span class="line">  args: [<span class="string">'--no-sandbox'</span>, <span class="string">'--disable-setuid-sandbox'</span>],</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">in</span> result) &#123;</span><br><span class="line">  <span class="keyword">let</span> page = <span class="keyword">await</span> browser.newPage();</span><br><span class="line">  pages.push(page);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 然后爬取数据</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">in</span> result) &#123;</span><br><span class="line">  <span class="keyword">let</span> url = getUrlByCode(result[index]);</span><br><span class="line">  <span class="keyword">await</span> pages[index]</span><br><span class="line">    .goto(url)</span><br><span class="line">    .then(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`页面<span class="subst">$&#123;<span class="built_in">Number</span>(index) + <span class="number">1</span>&#125;</span>打开成功`</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`页面<span class="subst">$&#123;<span class="built_in">Number</span>(index) + <span class="number">1</span>&#125;</span>资源超时`</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么我们是怎么获取数据的呢？其实大部分时间都花在了下面这个步骤上,就是分析目标网站的 dom 树结构</p>
+<p>首先我们需要分析数据的来源，打开控制台我们分析以下雪球股票页面的 dom 结构：</p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200728002422.jpg" alt="DOM"></p>
+<p>根据 puppeteer 的文档我们可以得出获取数据的方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">const</span> getStockAboutCode = <span class="function">(<span class="params">page, code</span>)=&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 在进行某些页面操作前，我们必须要等待指定的 DOM 加载完成后才能操作，比如，一个 Input 没有加载出来时，你是无法在里面输入字符的等等。在 Puppeteer 中，使用 page.waitForSelector 和选择器来等待某个 DOM 节点出现：</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// .stock-change就是我们要获取数据的dom结构</span></span><br><span class="line">  <span class="keyword">await</span> page.waitForSelector(<span class="string">'.stock-change'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用evaluate方法后我们就可以正常操作dom来获取数据了</span></span><br><span class="line">  <span class="keyword">const</span> back = <span class="keyword">await</span> page.evaluate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> obj = &#123;&#125;;</span><br><span class="line">    obj.price = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-current strong'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-current strong'</span>).innerText</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 价格</span></span><br><span class="line">    obj.zd = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>).innerText.split(<span class="string">' '</span>)[<span class="number">0</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 涨跌</span></span><br><span class="line">    obj.zd_per = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>).innerText.split(<span class="string">' '</span>)[<span class="number">1</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 涨跌幅</span></span><br><span class="line">    obj.name = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-name'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-name'</span>).innerText.split(<span class="string">'('</span>)[<span class="number">0</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 名称</span></span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;);</span><br><span class="line">  back.code = code;</span><br><span class="line">  <span class="keyword">return</span> back;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> result = <span class="keyword">await</span> <span class="built_in">Promise</span>.all(</span><br><span class="line">  pages.map(<span class="function">(<span class="params">page, index</span>) =&gt;</span> getStockAboutCode(page, result[index]))</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>那么 有了价格、涨幅之后 一些盈利、亏损的数据我们就可以根据这些数据计算得出了</p>
+<p>为了实时获取数据，或者间歇性获取数据，我们可以设置一个定时循环：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sleep</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve(<span class="string">'over'</span>);</span><br><span class="line">    &#125;, <span class="number">2000</span>); <span class="comment">// 两秒获取一次数据</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="comment">// 获取数据并且更新表格</span></span><br><span class="line">  <span class="comment">// ... code</span></span><br><span class="line">  sleep();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了数据之后我们就可以绘制图表了，这部分工作就没什么营养了，就是把一个 json 塞到 table 中，详情可以查阅文档。</p>
+<blockquote>
+<p>温馨提示： 由于 A 股中的某些信息散户不可能第一时间获取到，再加上一些内幕交易啥的，普通投资者很容易被割韭菜，谨慎入市</p>
+</blockquote>
+<blockquote>
+<p>本次只是 puppeteer 了解性质的实践，本人声明从未在上班时间搞这些花里胡哨的 0^0</p>
+</blockquote>
+<p>最后总结：puppeteer 还有很多强大的功能待我们去发掘，以后还是要多加深入学习，拓宽知识面（好吹牛逼）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckd4r05190001bcjf49zj49rz" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-深入理解useEffect" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" class="article-date">
@@ -132,7 +220,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" data-id="ckc0tdcac00043cjff1nk03lc" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" data-id="ckd4r051j000gbcjfdt2t5d74" class="article-share-link">分享</a>
       
       
       
@@ -247,7 +335,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" data-id="ckc0tdcaa00023cjf0e1k2fg7" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" data-id="ckd4r051g0008bcjf79soeosk" class="article-share-link">分享</a>
       
       
       
@@ -339,7 +427,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ckc0tdca500003cjf70tbdutw" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ckd4r051c0003bcjf5wrk1x85" class="article-share-link">分享</a>
       
       
       
@@ -464,7 +552,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckc0tdcai000e3cjf91ls5i5k" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckd4r051e0005bcjfb2b88m1b" class="article-share-link">分享</a>
       
       
       
@@ -577,7 +665,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckc0tdcaj000g3cjffk0593ou" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckd4r051d0004bcjf1c0y1vos" class="article-share-link">分享</a>
       
       
       
@@ -681,7 +769,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ckc0tdcah000b3cjfaro9aqyo" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ckd4r051i000ebcjfbcs45wag" class="article-share-link">分享</a>
       
       
       
@@ -771,7 +859,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ckc0tdcag00093cjfhusu1izn" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ckd4r051i000cbcjf1zhr4wsn" class="article-share-link">分享</a>
       
       
       
@@ -866,7 +954,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ckc0tdcae00063cjfbvf5e759" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ckd4r051l000ibcjf08au3phn" class="article-share-link">分享</a>
       
       
       
@@ -933,64 +1021,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ckc0tdcad00053cjf2lss1qgq" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-TypeScript封装的一个fetch包" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" class="article-date">
-  <time datetime="2019-08-30T13:06:19.000Z" itemprop="datePublished">2019-08-30</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/">TypeScript封装的一个fetch包</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <h1 id="自己封了个-fetch-，总结一下几个关键点"><a href="#自己封了个-fetch-，总结一下几个关键点" class="headerlink" title="自己封了个 fetch ，总结一下几个关键点"></a>自己封了个 fetch ，总结一下几个关键点</h1><h2 id="1-定义好要用的interface"><a href="#1-定义好要用的interface" class="headerlink" title="1. 定义好要用的interface"></a>1. 定义好要用的interface</h2><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; Omit &#125; <span class="keyword">from</span> <span class="string">'./util'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">enum</span> EMethod &#123;</span><br><span class="line">  Get = <span class="string">'GET'</span>,</span><br><span class="line">  Post = <span class="string">'POST'</span>,</span><br><span class="line">  Put = <span class="string">'PUT'</span>,</span><br><span class="line">  Delete = <span class="string">'DELETE'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchResponse &#123;</span><br><span class="line">  data: <span class="built_in">any</span></span><br><span class="line">  msg: <span class="built_in">string</span></span><br><span class="line">  success: <span class="built_in">boolean</span></span><br><span class="line">  RetCode: <span class="built_in">number</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">interface</span> IFetchConfig <span class="keyword">extends</span> Omit&lt;RequestInit, 'body'&gt; &#123;</span><br><span class="line">  method?: <span class="string">'GET'</span> | <span class="string">'POST'</span> | <span class="string">'PUT'</span> | <span class="string">'DELETE'</span></span><br><span class="line">  body?: object</span><br><span class="line">  dataType?: <span class="string">'hlj'</span> | <span class="string">'json'</span> | <span class="string">'text'</span></span><br><span class="line">  bodyType?: <span class="string">'json'</span> | <span class="string">'file'</span></span><br><span class="line">  codeKey?: <span class="built_in">string</span></span><br><span class="line">  ignore?: <span class="built_in">any</span>[]</span><br><span class="line">  onError?: <span class="function">(<span class="params">(<span class="params">RetCode, msg</span>) =&gt; <span class="built_in">void</span></span>) | <span class="params">null</span> | <span class="params">false</span></span></span><br><span class="line"><span class="function">  <span class="params">expect</span>?: <span class="params">any</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>请求的方法、返回的格式、请求体的格式、都定义好按照这个来，有一点是原生的RequestInit的body是必传的，根据我的需求body可以不传，所以omit掉了。（注： 最新的ts好像内置omit方法）附omit方法：</p>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">type</span> Omit&lt;T, K&gt; = Pick&lt;T, Exclude&lt;keyof T, K&gt;&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="2-参数的处理"><a href="#2-参数的处理" class="headerlink" title="2.参数的处理"></a>2.参数的处理</h2><p>原本的参数是一个对象的形式，get、delete请求方法时候要把对象转化成字符串拼接到url上</p>
-<h2 id="3-文件的处理"><a href="#3-文件的处理" class="headerlink" title="3.文件的处理"></a>3.文件的处理</h2><p>为了满足上传文件的需要，定义了一个 ‘file’ 类型的请求方式用于上传文件,使用FormData实现</p>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 上传文件</span></span><br><span class="line"><span class="keyword">if</span> (bodyType === <span class="string">'file'</span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">new</span> FormData()</span><br><span class="line">  <span class="built_in">Object</span>.keys(body).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    data.append(key, body[key])</span><br><span class="line">  &#125;)</span><br><span class="line">  requestInit.body = data</span><br><span class="line">  <span class="keyword">delete</span> requestInit.headers[<span class="string">'Content-Type'</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="4-fetch可配置化"><a href="#4-fetch可配置化" class="headerlink" title="4. fetch可配置化"></a>4. fetch可配置化</h2><p>每个项目中可能有不同的配置，比如自定义的统一错误提示、自定义的header</p>
-<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> configure = <span class="function">(<span class="params">&#123; config, ...rest &#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (isFunction(config)) &#123;</span><br><span class="line">    globalConfig = config(globalConfig)</span><br><span class="line">  &#125;</span><br><span class="line">  globalConfig = &#123; ...globalConfig, ...rest &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>本地项目中可以调用configure方法 把自己自定义的配置merge上去。</p>
-<h2 id="5-写测试"><a href="#5-写测试" class="headerlink" title="5.写测试"></a>5.写测试</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">"dependencies": &#123;</span><br><span class="line">    "@babel/core": "^7.4.5",</span><br><span class="line">    "@babel/preset-env": "^7.4.5",</span><br><span class="line">    "@babel/preset-typescript": "^7.3.3",</span><br><span class="line">    "@ryzen/eslint-config-ryzen": "^1.0.9",</span><br><span class="line">    "@types/jest": "^24.0.13",</span><br><span class="line">    "babel-jest": "^24.8.0",</span><br><span class="line">    "eslint": "4.19.1",</span><br><span class="line">    "global": "^4.3.2",</span><br><span class="line">    "jest": "^24.8.0",</span><br><span class="line">    "microbundle": "^0.11.0"</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> http, &#123; createApi &#125; <span class="keyword">from</span> <span class="string">'../src'</span></span><br><span class="line"></span><br><span class="line">test(<span class="string">'http, createApi, should have 4 method, get, post, post, delete'</span>, () =&gt; &#123;</span><br><span class="line">  ;[http, createApi].forEach(<span class="function"><span class="params">item</span> =&gt;</span> &#123;</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'post'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'get'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'delete'</span>)</span><br><span class="line">    expect(item).toHaveProperty(<span class="string">'put'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p><img src="/image/20191007202531.jpg" alt=""><br>对每一个必要的模块加上单元测试，这样再次迭代之后跑一下jest就不怕改坏了。</p>
-<h2 id="6-使用lerna进行多包管理"><a href="#6-使用lerna进行多包管理" class="headerlink" title="6.使用lerna进行多包管理"></a>6.使用lerna进行多包管理</h2><p>因为这个包依赖了其他自己写的包（eslint-config包）并且使用lerna可以方便的管理package之间的依赖、一键发布、打changelog等 </p>
-<p><img src="/image/20191007203309.jpg" alt=""><br><img src="/image/20191007203431.jpg" alt="lerna的多包管理"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ckc0tdca900013cjf3gq7b4eu" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ckd4r051h000abcjfbc5veane" class="article-share-link">分享</a>
       
       
       
@@ -1005,6 +1036,10 @@
 
   
 
+
+  <nav id="page-nav">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页&amp;raquo;</a>
+  </nav>
 </section>
            
     <aside id="sidebar">
@@ -1053,6 +1088,10 @@
       <ul>
         
           <li>
+            <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/">一次爬虫的实践.md</a>
+          </li>
+        
+          <li>
             <a href="/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/">深入理解useEffect</a>
           </li>
         
@@ -1068,10 +1107,6 @@
             <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
           </li>
         
-          <li>
-            <a href="/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/">从零创建一个项目要做的工作（一）</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1081,7 +1116,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 

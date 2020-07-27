@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>一次爬虫的实践.md | x1eJian&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的 接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppetee">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次爬虫的实践.md">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;07&#x2F;26&#x2F;%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5&#x2F;index.html">
+<meta property="og:site_name" content="x1eJian&#39;s blog">
+<meta property="og:description" content="一次爬虫的实践前言最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的 接下来就是实现的洗细节了 依赖主要的两个核心依赖是：  puppeteer tty-table  puppeteer爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看这里就可以了，我们可以用它来完成很多自动化的功能。  Puppetee">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20200727233849.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200727235833.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200727235846.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;QQ%E6%88%AA%E5%9B%BE20200728002422.jpg">
+<meta property="og:updated_time" content="2020-07-27T16:50:40.655Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;image&#x2F;20200727233849.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="x1eJian&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    
+    <div id="header-inner" class="inner">
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      
+    </div>
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">x1eJian&#39;s blog</a>
+      </h1>
+      
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-一次爬虫的实践" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" class="article-date">
+  <time datetime="2020-07-26T13:11:49.000Z" itemprop="datePublished">2020-07-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      一次爬虫的实践.md
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h1 id="一次爬虫的实践"><a href="#一次爬虫的实践" class="headerlink" title="一次爬虫的实践"></a>一次爬虫的实践</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近市场很是火爆，作为一个小韭菜我也磨拳擦掌跃跃欲试，为了更好的了解市场行情，于是乎整了个命令行看盘的工具，效果图是这样的</p>
+<p>接下来就是实现的洗细节了</p>
+<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><p>主要的两个核心依赖是：</p>
+<ul>
+<li>puppeteer</li>
+<li>tty-table</li>
+</ul>
+<h3 id="puppeteer"><a href="#puppeteer" class="headerlink" title="puppeteer"></a>puppeteer</h3><p>爬虫工具选用的是 puppeteer，关于 puppeteer 的介绍看<a href="https://pptr.dev/" target="_blank" rel="noopener">这里</a>就可以了，我们可以用它来完成很多自动化的功能。</p>
+<blockquote>
+<p>Puppeteer 是一个 Node 库，它提供了高级 API 来通过 DevTools 协议控制 Chrome 或 Chromium. 我们在浏览器中手动执行的大多数操作都可以使用 Puppeteer 来自动完成</p>
+</blockquote>
+<h3 id="tty-table"><a href="#tty-table" class="headerlink" title="tty-table"></a>tty-table</h3><p>这是一个 Terminal App,大白话说就是在命令行中绘制表格的，文档点<a href="https://ttytoolkit.org/" target="_blank" rel="noopener">这里</a></p>
+<p>那么接下来就开冲吧！</p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>为了简易实现和安全性考虑，源数据都是需要手填的，就像这样</p>
+<p><img src="/image/20200727233849.jpg" alt="配置文件"></p>
+<p>做成 json 文件或者 js 文件都可以,我们需要读取设定好的变量，然后去爬取我们设置股票代码对应的数据（现价），通过计算得出我们想要的数据， 最终决定悄悄的去<a href="https://xueqiu.com/" target="_blank" rel="noopener">雪球</a>这个网站获取数据，通过分析雪球这个网站的 url 发现，在上交所上市的公司地址都是<code>https://xueqiu.com/S/SHxxxxxx</code>,在深交所上市的公司地址都是<code>https://xueqiu.com/S/SZxxxxxx</code>（注： xxxxxx 代表股票代码），如下图</p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200727235833.jpg" alt="上证指数包含的股票地址"></p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200727235846.jpg" alt="深证指数包含的股票地址"></p>
+<p>由于创业板、科创板交易门槛要求过高，这里我们就不考虑了。</p>
+<blockquote>
+<p>科普：创业板的交易门槛是对存量投资者的适当性管理要求基本保持不变，新增创业板个人投资者须满足前 20 个交易日日均资产不低于 10 万元，且具备 24 个月的 A 股交易经验的门槛；科创板的交易门槛是股票交易必 5261 须满两年、投资者在开通科创板账户之前的二十个交易日，账户必须有不低于 50 万元的流动资金</p>
+</blockquote>
+<p>查阅资料发现 股票代码 5、6 开头的股票属于沪市（6 为股票、5 为 ETF 基金），那么我们就可以得出爬虫获取 url 的方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> getUrlByCode = <span class="function">(<span class="params">code = <span class="string">''</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (!code) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Invalid code'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> tag = [<span class="string">'5'</span>, <span class="string">'6'</span>].includes(code[<span class="number">0</span>]) ? <span class="string">'SH'</span> : <span class="string">'SZ'</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">`https://xueqiu.com/S/<span class="subst">$&#123;tag&#125;</span><span class="subst">$&#123;code&#125;</span>`</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>拿到链接之后就可以通过 puppeteer 来获取数据了</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每一个code都会被映射成一个page 最终存储到一个pages数组里</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> browser = <span class="keyword">await</span> puppeteer.launch(&#123;</span><br><span class="line">  args: [<span class="string">'--no-sandbox'</span>, <span class="string">'--disable-setuid-sandbox'</span>],</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">in</span> result) &#123;</span><br><span class="line">  <span class="keyword">let</span> page = <span class="keyword">await</span> browser.newPage();</span><br><span class="line">  pages.push(page);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 然后爬取数据</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> index <span class="keyword">in</span> result) &#123;</span><br><span class="line">  <span class="keyword">let</span> url = getUrlByCode(result[index]);</span><br><span class="line">  <span class="keyword">await</span> pages[index]</span><br><span class="line">    .goto(url)</span><br><span class="line">    .then(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`页面<span class="subst">$&#123;<span class="built_in">Number</span>(index) + <span class="number">1</span>&#125;</span>打开成功`</span>);</span><br><span class="line">    &#125;)</span><br><span class="line">    .catch(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">`页面<span class="subst">$&#123;<span class="built_in">Number</span>(index) + <span class="number">1</span>&#125;</span>资源超时`</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么我们是怎么获取数据的呢？其实大部分时间都花在了下面这个步骤上,就是分析目标网站的 dom 树结构</p>
+<p>首先我们需要分析数据的来源，打开控制台我们分析以下雪球股票页面的 dom 结构：</p>
+<p><img src="/image/QQ%E6%88%AA%E5%9B%BE20200728002422.jpg" alt="DOM"></p>
+<p>根据 puppeteer 的文档我们可以得出获取数据的方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">const</span> getStockAboutCode = <span class="function">(<span class="params">page, code</span>)=&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 在进行某些页面操作前，我们必须要等待指定的 DOM 加载完成后才能操作，比如，一个 Input 没有加载出来时，你是无法在里面输入字符的等等。在 Puppeteer 中，使用 page.waitForSelector 和选择器来等待某个 DOM 节点出现：</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// .stock-change就是我们要获取数据的dom结构</span></span><br><span class="line">  <span class="keyword">await</span> page.waitForSelector(<span class="string">'.stock-change'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用evaluate方法后我们就可以正常操作dom来获取数据了</span></span><br><span class="line">  <span class="keyword">const</span> back = <span class="keyword">await</span> page.evaluate(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> obj = &#123;&#125;;</span><br><span class="line">    obj.price = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-current strong'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-current strong'</span>).innerText</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 价格</span></span><br><span class="line">    obj.zd = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>).innerText.split(<span class="string">' '</span>)[<span class="number">0</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 涨跌</span></span><br><span class="line">    obj.zd_per = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-change'</span>).innerText.split(<span class="string">' '</span>)[<span class="number">1</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 涨跌幅</span></span><br><span class="line">    obj.name = <span class="built_in">document</span>.querySelector(<span class="string">'.stock-name'</span>)</span><br><span class="line">      ? <span class="built_in">document</span>.querySelector(<span class="string">'.stock-name'</span>).innerText.split(<span class="string">'('</span>)[<span class="number">0</span>]</span><br><span class="line">      : <span class="string">''</span>; <span class="comment">// 名称</span></span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;);</span><br><span class="line">  back.code = code;</span><br><span class="line">  <span class="keyword">return</span> back;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> result = <span class="keyword">await</span> <span class="built_in">Promise</span>.all(</span><br><span class="line">  pages.map(<span class="function">(<span class="params">page, index</span>) =&gt;</span> getStockAboutCode(page, result[index]))</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>那么 有了价格、涨幅之后 一些盈利、亏损的数据我们就可以根据这些数据计算得出了</p>
+<p>为了实时获取数据，或者间歇性获取数据，我们可以设置一个定时循环：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sleep</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      resolve(<span class="string">'over'</span>);</span><br><span class="line">    &#125;, <span class="number">2000</span>); <span class="comment">// 两秒获取一次数据</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">  <span class="comment">// 获取数据并且更新表格</span></span><br><span class="line">  <span class="comment">// ... code</span></span><br><span class="line">  sleep();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了数据之后我们就可以绘制图表了，这部分工作就没什么营养了，就是把一个 json 塞到 table 中，详情可以查阅文档。</p>
+<blockquote>
+<p>温馨提示： 由于 A 股中的某些信息散户不可能第一时间获取到，再加上一些内幕交易啥的，普通投资者很容易被割韭菜，谨慎入市</p>
+</blockquote>
+<blockquote>
+<p>本次只是 puppeteer 了解性质的实践，本人声明从未在上班时间搞这些花里胡哨的 0^0</p>
+</blockquote>
+<p>最后总结：puppeteer 还有很多强大的功能待我们去发掘，以后还是要多加深入学习，拓宽知识面（好吹牛逼）</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckd4r05190001bcjf49zj49rz" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+ <script src="/jquery/jquery.min.js"></script>
+  <div id="random_posts">
+    <h2>推荐文章</h2>
+    <div class="random_posts_ul">
+      <script>
+          var random_count =4
+          var site = {BASE_URI:'/'};
+          function load_random_posts(obj) {
+              var arr=site.posts;
+              if (!obj) return;
+              // var count = $(obj).attr('data-count') || 6;
+              for (var i, tmp, n = arr.length; n; i = Math.floor(Math.random() * n), tmp = arr[--n], arr[n] = arr[i], arr[i] = tmp);
+              arr = arr.slice(0, random_count);
+              var html = '<ul>';
+            
+              for(var j=0;j<arr.length;j++){
+                var item=arr[j];
+                html += '<li><strong>' + 
+                item.date + ':&nbsp;&nbsp;<a href="' + (site.BASE_URI+item.uri) + '">' + 
+                (item.title || item.uri) + '</a></strong>';
+                if(item.excerpt){
+                  html +='<div class="post-excerpt">'+item.excerpt+'</div>';
+                }
+                html +='</li>';
+                
+              }
+              $(obj).html(html + '</ul>');
+          }
+          $('.random_posts_ul').each(function () {
+              var c = this;
+              if (!site.posts || !site.posts.length){
+                  $.getJSON(site.BASE_URI + 'js/posts.js',function(json){site.posts = json;load_random_posts(c)});
+              } 
+               else{
+                load_random_posts(c);
+              }
+          });
+      </script>
+    </div>
+  </div>
+
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">深入理解useEffect</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+ 
+     
+  <div class="comments" id="comments">
+    
+     
+       
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+       
+      
+      
+  </div>
+ 
+  
+
+</section>
+           
+    <aside id="sidebar">
+  
+    
+
+  
+    
+    <div class="widget-wrap">
+    
+      <div class="widget" id="toc-widget-fixed">
+      
+        <strong class="toc-title">文章目录</strong>
+        <div class="toc-widget-list">
+              <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一次爬虫的实践"><span class="toc-number">1.</span> <span class="toc-text">一次爬虫的实践</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#依赖"><span class="toc-number">1.2.</span> <span class="toc-text">依赖</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#puppeteer"><span class="toc-number">1.2.1.</span> <span class="toc-text">puppeteer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#tty-table"><span class="toc-number">1.2.2.</span> <span class="toc-text">tty-table</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#开始"><span class="toc-number">1.3.</span> <span class="toc-text">开始</span></a></li></ol></li></ol>
+          </div>
+      </div>
+    </div>
+
+  
+    
+
+  
+    
+  
+    
+  
+    
+
+  
+    
+  
+    <!--微信公众号二维码-->
+
+
+  
+</aside>
+
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-left">
+      &copy; 2014 - 2020 x1eJian&nbsp;|&nbsp;
+      主题 <a href="https://github.com/giscafer/hexo-theme-cafe/" target="_blank">Cafe</a>
+    </div>
+     <div id="footer-right">
+      联系方式&nbsp;|&nbsp;youemail@outlook.com
+    </div>
+  </div>
+</footer>
+ <script src="/jquery/jquery.min.js"></script>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+    <img class="back-to-top-btn" src="/images/fly-to-top.png"/>
+<script>
+// Elevator script included on the page, already.
+window.onload = function() {
+  var elevator = new Elevator({
+    selector:'.back-to-top-btn',
+    element: document.querySelector('.back-to-top-btn'),
+    duration: 1000 // milliseconds
+  });
+}
+</script>
+      
+
+  
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "e2fb4051c49842688ce669e634bc983f",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+    
+
+  
+
+
+
+
+
+
+
+<!-- author:forvoid begin -->
+<!-- author:forvoid begin -->
+
+<!-- author:forvoid end -->
+
+<!-- author:forvoid end -->
+
+
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      })
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      })
+    </script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+ <script src="/js/is.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+<script src="/js/elevator.js"></script>
+  </div>
+</body>
+</html>
