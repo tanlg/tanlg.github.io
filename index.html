@@ -65,6 +65,107 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-发布订阅模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/09/08/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/" class="article-date">
+  <time datetime="2020-09-08T02:15:03.000Z" itemprop="datePublished">2020-09-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/09/08/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/">发布订阅模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>这篇博客的的主题是 发布订阅模式，我们先一起了解一下设计模式。</p>
+<p>设计模式起源于建筑领域，现在我们所说的设计模式可以看作软件工程的一个分支，是在软件工程实践过程中，程序员们总结出的良好的编程方法。我们可以把设计模式理解为编程的总体指导思路或参照样板。当然，软件工程中并非只有设计模式，还包括 架构模式、分析模式和过程模式等，在软件生存期的每一个阶段都存在着一些被认同的模式，比如大家听到比较多的观察者模式、MVC 等。设计模式于程序员而言相当重要，它是我们写出优秀程序的保障。设计模式与程序员的架构能力与阅读源码的能力息息相关，非常值得我们深入学习。<br>举例来说：我们都知道面向对象编程，面向对象的特点是高可维护性、可复用性、可拓展、灵活性好，但是面向对象的真正强大的地方是随着业务变得越来越复杂，面向对象依然能够使得程序结构良好，而面向过程却会导致程序越来越臃肿。其中让面向对象保持结构良好的秘诀就是设计模式。</p>
+<p>所以，学习设计模式，可以提升我们的编程能力，不仅仅是前端能力。那么接下来我会分享设计模式中前端用的比较多的一种模式：发布订阅模式。</p>
+<p>在软件架构中，发布/订阅是一种消息范式，消息的发送者（称为发布者）不会将消息直接发送给特定的接收者（称为订阅者），而是通过消息通道广播出去，让订阅改消息主题的订阅者消费到。跟观察者模式还是一些区别的。发布/订阅者模式最大的特点就是实现了松耦合，也就是说你可以让发布者发布消息、订阅者接受消息，而不是寻找一种方式把两个分离的系统连接在一起。当然这种松耦合也是发布/订阅者模式最大的缺点，因为需要中间的代理，增加了系统的复杂度。而且发布者无法实时知道发布的消息是否被每个订阅者接收到了，增加了系统的不确定性。</p>
+<p>综上，我们知道发布订阅模式中存在三个角色：发布者、事件总线（事件通道、消息中心）、订阅者</p>
+<p><img src="/image/2020092202131.png" alt="发布订阅模式"></p>
+<p>那么这种模式有什么优缺点？总结了以下几点：</p>
+<ol>
+<li>松耦合<br>发布-订阅模式可以将众多需要通信的子系统(Subsystem)解耦，每个子系统独立管理。而且即使部分子系统取消订阅，也不会影响事件总线的整体管理。 发布-订阅模式中每个应用程序都可以专注于其核心功能，而事件总线负责将消息路由到每个订阅者手里。</li>
+<li>高伸缩性<br>发布-订阅模式增加了系统的可伸缩性，提高了发布者的响应能力。原因是发布者(Publisher)可以快速地向输入通道发送一条消息，然后返回到其核心处理职责，而不必等待子系统处理完成。然后事件总线负责确保把消息传递到每个订阅者(Subscriber)手里。</li>
+<li>高可靠性<br>发布-订阅模式提高了可靠性。异步的消息传递有助于应用程序在增加的负载下继续平稳运行，并且可以更有效地处理间歇性故障。</li>
+<li>灵活性<br>不需要关心不同的组件是如何组合在一起的，只要他们共同遵守一份协议即可。 发布-订阅模式允许延迟处理或者按计划的处理。例如当系统负载大的时候，订阅者可以等到非高峰时间才接收消息，或者根据特定的计划处理消息。</li>
+</ol>
+<p>缺点<br>在创建订阅者本身会消耗内存，但当订阅消息后，没有进行发布，而订阅者会一直保存在内存中，占用内存</p>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><p>介绍了这么多概念，感觉很枯燥，为了加深印象，接下来就手动实现一个简单的发布订阅模式，写之前我们需要先捋一下思路</p>
+<p>创建一个 EventChanel 对象<br>给 EventChanel 添加一个缓存列表，用于存放回调函数以便通知订阅者<br>发布消息时，EventChanel 遍历缓存列表，依次触发回调<br>故 EventChanel 应该有 emit (发布) 、on (订阅) 方法。<br>这个发布订阅只会有 on/emit 功能，也就是发布/订阅两个功能。其他的诸如 off/once 或者其他一些拓展性的功能都不会出现。</p>
+<p>定义消息中心、发布/订阅行为的格式，其中消息中心会有 on/emit（发布/订阅）两种方法，发布行为包括事件类型和相关的数据，即 eventType、data，订阅行为包括事件类型和订阅的回调函数，也就是 eventType 和 callback。</p>
+<p><img src="/image/2020092202308.png" alt="定义"></p>
+<p>接下来是实现消息中心的具体细节，这是一个最简化的模型，在这个 class 中定一个消息队列 subjects 来储存相关的订阅行为。然后是 on/emit 的具体实现逻辑，当执行 on 的时候，我们会把传入的 eventType 和对应的回调函数 push 到 subjects 中，当执行 emit 时我们会根据传入的 eventType 来确定要执行的 callback 队列，同时把传入 emit 方法中的 data 传入到 callback 中使用</p>
+<p><img src="/image/2020092202405.png" alt="消息中心"></p>
+<p>那么最简单的一个消息中心就实现完成了，接下来我们要使用这个消息中心模拟一下日常公众号发消息的场景</p>
+<p>假设刚才实现的消息中心是微信公众号，我作为订阅者希望接受到来自第三方服务商的消息，比如健身房、烧饼店。那么我会提供每一个 eventType 对应的回调信息，比如健身房开张的时候我需要微信公众号实时告诉我健身房开门了，同时当健身房老板开门的时候，老板只需要告诉微信公众号开门了，那么微信公众号就回自动告诉我相关的消息，这样就做到了我与健身房老板之间解耦合。如图，event1、event2 是我作为订阅者提供给消息中心的格式，意思是，当健身房、烧饼店老板产生消息的时候提示我。publisher1、publisher2、publisher3、是各种老板提供给消息中心的消息，就这样，消息中心可以根据 eventType 来进行消息的调度。</p>
+<p><img src="/image/2020092202438.png" alt="publisher"></p>
+<p><img src="/image/2020092202530.png" alt="subscriber"></p>
+<p>接下来，我们来模拟一个事件流，实例化一个消息中心，然后我对消息中心进行消息的订阅，分别是图中的 event1、event2，此时烧饼店老板发布消息，说自己开张了，那么我就会收到烧饼店老板的消息，过了两秒之后，健身房老板发布消息说健身房开门了，然后我就回收到这条消息，然后去考虑是去买烧饼还是去健身，纠结了五秒，此时烧饼店老板又发布了消息，说家里有事情关门了，让我下次再来，那么我收到消息后就决定去健身房了。</p>
+<p><img src="/image/stream.png" alt="stream"></p>
+<p>在控制台中打印出消息如图所示，其中 inner message 是消息中心内部的 log，这个事件最终的执行结果就是</p>
+<p><img src="/image/console.png" alt="console"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>事件通道作为调度中心，管理事件的订阅和发布工作，彻底隔绝了订阅者和发布者的依赖关系。即订阅者在订阅事件的时候，只关注事件本身，而不关心谁会发布这个事件；发布者在发布事件的时候，只关注事件本身，而不关心谁订阅了这个事件。再举一个例子，你在微博上关注了 A，同时其他很多人也关注了 A，那么当 A 发布动态的时候，微博就会为你们推送这条动态。A 就是发布者，你是订阅者，微博就是调度中心，你和 A 是没有直接的消息往来的，全是通过微博来协调的</p>
+<h2 id="前端中的发布订阅"><a href="#前端中的发布订阅" class="headerlink" title="前端中的发布订阅"></a>前端中的发布订阅</h2><p>前面说了那么多，那么前端中有哪些地方应用了发布订阅，接下来就通过一些例子来看一下，发布订阅在前端中的应用</p>
+<h3 id="redux"><a href="#redux" class="headerlink" title="redux"></a>redux</h3><p>首先第一个例子就是 react-redux</p>
+<p>redux 作为 react 公共状态管理容器，配合 react-redux 可以很好的派发更新，更新视图渲染的作用，其中<br>订阅行为是通过 Provider 这个高阶组件创建一个 contextValue，通过 react 上下文 context 把 contextValue（也就是 store）传递给子孙组件。<br>同时，Provider 会创建一个名叫 Subscription 的 class，这个 class 会收集所有被 connect 包裹的组件的更新函数 onStateChange 生成一个 callback 队列，由 Subscription 的内部方法统一派发执行更新。这就相当于一个订阅的行为。</p>
+<p>发布行为是由 dispatch 执行的。通过 dispatch 分发定义好的 action，然后 reducer 就根据 action 修改 state。这样通过 connect 包裹的组件就能获取到最新的 state 了。<br>当然实际的发布订阅过程并没有这么简单，具体细节还是需要多多分析源码。</p>
+<p>那么知道这个之后，如果我们自己去实现一个简单的数据流框架 就可以用这个思路了。</p>
+<h3 id="webpack-amp-Tapable"><a href="#webpack-amp-Tapable" class="headerlink" title="webpack &amp; Tapable"></a>webpack &amp; Tapable</h3><p>第二个例子是与 webpack 相关的，这个例子所反映的设计模式跟发布订阅模式区别很小，被称做观察者模式，</p>
+<p>观察者模式： 建立一种对象与对象之间的依赖关系，一个对象发生改变时将自动通知其他对象，其他对象将相应做出反应。在此，发生改变的对象称为观察目标，而被通知的对象称为观察者，一个观察目标可以对应多个观察者，而且这些观察者之间没有相互联系，可以根据需要增加和删除观察者，使得系统更易于扩展，这就是观察者模式的模式动机。<br>观察者模式跟发布订阅模式的区别是，发布订阅是存在三个角色，发布者、订阅者、消息中心，而观察者模式是观察者和观察目标，就相当于发布订阅模式中的消息中心和订阅者。</p>
+<p><img src="/image/view.png" alt="观察者模式"></p>
+<p>说完观察者模式，再说一下 webpack,webpack 本质上是一种事件流的机制，它的工作流程就是将各个插件串联起来，而实现这一切的核心就是 Tapable。</p>
+<p>Tapable 是 Webpack 的一个核心依赖。类似于 node 中的 events 库，其核心原理是一个观察者模式的实现。作用是提供类似的插件接口。</p>
+<p>在 webpack 构建流程中会生成两个非常重要的对象 Compiler 和 Compilation<br>Compiler 对象包含了当前运行 Webpack 的配置，包括 entry、output、loaders 等配置，这个对象在启动 Webpack 时被实例化，而且是全局唯一的。plugin 可以通过该对象获取到 webpack 的配置信息进行处理。详见 node_modules/webpack/lib/Compiler.js</p>
+<p>Compilation 对象代表了一次资源版本构建。当运行 webpack 开发环境中间件时，每当检测到一个文件变化，就会创建一个新的 compilation，从而生成一组新的编译资源。一个 Compilation 对象表现了当前的模块资源、编译生成资源、变化的文件、以及被跟踪依赖的状态信息，简单来讲就是把本次打包编译的内容存到内存里。</p>
+<p>Compilation 对象也提供了插件需要自定义功能的回调，以供插件做自定义处理时选择使用拓展。最后，这个对象还会负责 bundles 的创建。详见 node_modules/webpack/lib/Compilation.js\</p>
+<p>所以：Compiler 代表了整个 Webpack 从启动到关闭的生命周期，而 Compilation 只是代表了一次新的编译，只要文件有改动，compilation 就会被重新创建，我们在写插件的时候要先考虑去操作 Compiler 还是 Compilation。</p>
+<p><img src="/image/compiler.png" alt="compiler"></p>
+<p>这两个对象都是 Tapable 的实例，会在 webpack 执行的过程中生成。这里就以 Compiler 举例来说：</p>
+<p>当我们在写 webpack 插件的时候，apply 方法都会传入一个 compiler 参数，这个参数是 webpck compiler 的引用，因为插件中存在 apply 方法，执行 webpack 打包的时候 Compiler 会执行一次 apply 方法，在 complier 中注册插件的逻辑，绑定到 Compiler.hooks 中</p>
+<p>拿 BenchmarkWebpackPlugin 举例：<br>执行 new BenchmarkWebpackPlugin() 初始化一个 BenchmarkWebpackPlugin 获得其实例。<br>初始化 compiler 对象后调用 BenchmarkWebpackPlugin.apply(compiler) 给插件实例传入 compiler 对象。<br>插件实例在获取到 compiler 对象后，就可以通过 compiler.plugin(事件名称, 回调函数) 监听到 Webpack 广播出来的事件。 并且可以通过 compiler 去操作 Webpack。<br>在这里 done 是一个异步 hooks，在编译完成后执行回调函数来计算打包到速度。</p>
+<p><img src="/image/apply.png" alt="apply"></p>
+<p>注意一点是第二个截图两种写法都可以，第一种是 webpack 的官方写法，第二种是 tapable 的写法，因为 compiler 是 tapable 的实例，所以两种写法都可，推荐第一种</p>
+<p>注意二 tapable 内置有同步 hooks 和异步 hooks，在使用异步 hooks 时使用的 api 是 tapAsync，此外还有第三种 tapPromise，详细可以参考 webpack 文档</p>
+<p>这样相当于一个观察者，去观察 webpack 这个目标，当 webpack 执行到对应的 hooks 时，观察者就会做出反应</p>
+<p>从这也可以体会的出设计模式的可拓展性</p>
+<h3 id="其他的一些例子"><a href="#其他的一些例子" class="headerlink" title="其他的一些例子"></a>其他的一些例子</h3><ul>
+<li>EventTarget.addEventListener</li>
+<li>Vue $on $emit eventBus</li>
+<li>Node.js eventEmitter</li>
+</ul>
+<p>以上都有发布订阅的身影</p>
+<p>这些编程的通用思想会提升我们的编程水平，工作之余可多加学习一番</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/09/08/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/" data-id="ckfcr0l1s0008lgjf4glg3e0b" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/" rel="tag">Code</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-一次爬虫的实践" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" class="article-date">
@@ -140,7 +241,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckd4r44o50000nwjfe3hi8hs0" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/" data-id="ckfcr0l1i0000lgjf2g9nesu9" class="article-share-link">分享</a>
       
       
       
@@ -221,7 +322,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" data-id="ckd4r44oh000cnwjfgzyv97z1" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/06/29/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3useEffect/" data-id="ckfcr0l1x000ilgjfbxd1ctwq" class="article-share-link">分享</a>
       
       
       
@@ -336,7 +437,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" data-id="ckd4r44og000anwjffx041z27" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/05/18/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8E%E9%87%8D%E6%9E%84%E8%A6%81%E7%82%B9%E6%80%BB%E7%BB%93/" data-id="ckfcr0l1z000klgjf7lg3dm35" class="article-share-link">分享</a>
       
       
       
@@ -428,7 +529,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ckd4r44ob0003nwjfaaeb0jmf" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/" data-id="ckfcr0l1q0005lgjf3z1icybz" class="article-share-link">分享</a>
       
       
       
@@ -553,7 +654,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckd4r44of0008nwjf1tw87ao6" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/" data-id="ckfcr0l1u000algjfby518evl" class="article-share-link">分享</a>
       
       
       
@@ -666,7 +767,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckd4r44oc0004nwjf0r8k9r32" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/02/24/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%B8%80%EF%BC%89/" data-id="ckfcr0l1m0001lgjfctd8emty" class="article-share-link">分享</a>
       
       
       
@@ -770,7 +871,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ckd4r44oj000gnwjf5xzy3fiq" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2020/01/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%BA%9B%E4%BD%BF%E7%94%A8TypeScript%E6%97%B6%E7%A2%B0%E5%88%B0%E7%9A%84%E5%9D%91%E7%82%B9/" data-id="ckfcr0l1w000flgjffqthhhqo" class="article-share-link">分享</a>
       
       
       
@@ -860,7 +961,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ckd4r44oi000enwjfg4l6erdk" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/12/18/%E6%B8%85%E7%90%86%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E6%97%A0%E6%95%88%E4%BB%A3%E7%A0%81/" data-id="ckfcr0l1p0004lgjfchqz9laj" class="article-share-link">分享</a>
       
       
       
@@ -955,74 +1056,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ckd4r44ok000inwjf7yxf4tk8" class="article-share-link">分享</a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
- 
-
-
-  
-    <article id="post-开发过程中webpack内存溢出问题" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" class="article-date">
-  <time datetime="2019-10-24T10:55:21.000Z" itemprop="datePublished">2019-10-24</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/">开发过程中webpack内存溢出问题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <!-- Table of Contents -->
-        
-        <p>mage项目比较大，启动起来保存几下就崩溃了，如图：<br><img src="/image/20191024185854.jpg" alt="mage崩溃图"><br>google查阅相关资料，整个插件分析一下 webpack-bundle-analyzer</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; BundleAnalyzerPlugin &#125; = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> BundleAnalyzerPlugin()</span><br></pre></td></tr></table></figure>
-<p>启动后发现，嚯，这么大。怪不得妹纸崩溃了。<br><img src="/image/20191024190619.jpg" alt="mage崩溃原因图"></p>
-<p>分析一下原因：</p>
-<ol>
-<li>项目本身太大了，开发过程中把所有入口的项目都打包了（hr pc端、hr移动端、 hm pc端、hm移动端等等）。</li>
-<li>使用的其他仓库的东西没有做按需加载（比如 moka UI）<br><img src="/image/20191024192752.jpg" alt="开发环境打包的js每个都含有 1M+ 大小的moka UI"></li>
-<li>三方库用的太多，挖掘机炒菜。（猜测很多库只用到了很小到一部分功能，对应的功能完全可以手动实现？）</li>
-</ol>
-<p>展望一下未来的优化思路以及解决方法：</p>
-<ol>
-<li>爷有钱，加内存！<br><img src="/image/20191024193632.jpg" alt="炫富"><br>4096不行，整上40960<br>很捞的方法，也是我正在使用的方法，优点是省事，缺点是除了省事没别的了，作为一位程序员还是要有不断优化项目的觉悟。</li>
-<li>曾经用过的一个方法，webpack按照路由编译，<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">entry: &#123;</span><br><span class="line">  app: [</span><br><span class="line">    <span class="built_in">require</span>.resolve(<span class="string">'./polyfills'</span>),</span><br><span class="line">    <span class="string">'react-hot-loader/patch'</span>,</span><br><span class="line">    config.startRoutes ? paths.appDevIndexJs : paths.appIndexJs</span><br><span class="line">  ]</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-具体思路是两个参数(根目录整个config.js配置一下)，一个用来控制是否按路由启动， 第二个参数是传入的路由文件（组件），这样就把需要调试的地方渲染出来了，很快。（缺点是对路由文件的管理比较严格，改一改应该可以应用到mage项目里）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  port: <span class="number">3000</span>,</span><br><span class="line">  proxy: &#123;</span><br><span class="line">    <span class="string">'/p'</span>: <span class="string">'http://test.mokahr.com'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;&#125;,</span><br><span class="line">  publicPath: <span class="string">'/'</span>,</span><br><span class="line">  eslint: <span class="literal">true</span>,</span><br><span class="line">  bundleAnalyzer: <span class="literal">false</span>,</span><br><span class="line">  autoOpenUrl: <span class="function"><span class="params">port</span> =&gt;</span> <span class="string">`http://test.mokahr.com:<span class="subst">$&#123;port&#125;</span>`</span>,</span><br><span class="line">  startRoutes: <span class="literal">false</span>,</span><br><span class="line">  routePath: <span class="string">'xxxxxx'</span></span><br><span class="line">  useTs: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>把不同的入口拆成不同的仓库，这样就能单独维护某一个端了。</li>
-<li>新的suger design 已经做按需加载了，很棒，应该就跟antd design + babel-plugin-import 的效果一样 引入对应的文件。</li>
-<li>网上找了个方法，还没来得及看，先放这儿了<br>使用webbpack-dev-serve钩子进行单独编译：在webpack-dev-serve中，有一个钩子before，在访问页面的时候我们能够拿到页面信息的路径，下面是实现<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vue.config.js</span></span><br><span class="line"><span class="keyword">const</span> compiledPages = [];</span><br><span class="line">before(app) &#123;</span><br><span class="line">      app.get(<span class="string">'*.html'</span>, (req, res, next) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> result = req.url.match(<span class="regexp">/[^/]+?(?=\.)/</span>);</span><br><span class="line">        <span class="keyword">const</span> pageName = result &amp;&amp; result[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">const</span> pagesName = <span class="built_in">Object</span>.keys(multiPageConfig);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pageName) &#123;</span><br><span class="line">          <span class="keyword">if</span> (pagesName.includes(pageName)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!compiledPages.includes(pageName)) &#123;</span><br><span class="line">              <span class="keyword">const</span> page = multiPageConfig[pageName];</span><br><span class="line">              fs.writeFileSync(<span class="string">`dev-entries/<span class="subst">$&#123;pageName&#125;</span>.js`</span>, <span class="string">`import '../<span class="subst">$&#123;page.tempEntry&#125;</span>'; // eslint-disable-line`</span>);</span><br><span class="line">              compiledPages.push(pageName);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 没这个入口</span></span><br><span class="line">            res.writeHead(<span class="number">200</span>, &#123; <span class="string">'content-type'</span>: <span class="string">'text/html; charset=utf-8'</span> &#125;);</span><br><span class="line">            res.end(<span class="string">'&lt;p style="font-size: 50px;"&gt;不存在的入口&lt;/p&gt;'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        next();</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line"><span class="keyword">const</span> util = <span class="built_in">require</span>(<span class="string">'util'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = util.promisify(fs.writeFile);</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> tasks = [];</span><br><span class="line">  <span class="keyword">if</span> (!fs.existsSync(<span class="string">'dev-entries'</span>)) &#123;</span><br><span class="line">    fs.mkdirSync(<span class="string">'dev-entries'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">Object</span>.keys(pages).forEach(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> entry = <span class="string">`dev-entries/<span class="subst">$&#123;key&#125;</span>.js`</span>;</span><br><span class="line">    pages[key].tempEntry = pages[key].entry; <span class="comment">// 暂存真正的入口文件地址</span></span><br><span class="line">    pages[key].entry = entry;</span><br><span class="line">    tasks.push(outputFile(entry, <span class="string">''</span>));</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">await</span> <span class="built_in">Promise</span>.all(tasks);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (process.env.NODE_ENV === <span class="string">'development'</span>) &#123;</span><br><span class="line">  main();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = pages;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ckd4r44od0005nwjf6vdn7kq7" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/11/20/%E9%81%BF%E5%85%8D%E9%9D%A2%E5%90%91%E7%9B%91%E7%8B%B1%E7%BC%96%E7%A8%8B/" data-id="ckfcr0l20000mlgjf4a85b3z3" class="article-share-link">分享</a>
       
       
       
@@ -1077,7 +1111,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title tagcloud">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/JavaScript/" style="font-size: 14px;">JavaScript</a>
+      <a href="/tags/Code/" style="font-size: 14px;">Code</a> <a href="/tags/JavaScript/" style="font-size: 25px;">JavaScript</a>
     </div>
   </div>
 
@@ -1087,6 +1121,10 @@
     <h3 class="widget-title recent-posts">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/09/08/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/">发布订阅模式</a>
+          </li>
         
           <li>
             <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/">一次爬虫的实践.md</a>
@@ -1104,10 +1142,6 @@
             <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/">业务开发过程中一些事情关于多人协作的记录</a>
           </li>
         
-          <li>
-            <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1117,7 +1151,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title archive">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">August 2019</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -1125,7 +1159,7 @@
   
     
 <div class="widget-wrap">
-    <h3 class="widget-title">Links</h3>
+    <h3 class="widget-title">友情链接</h3>
     <div class="widget">
         <ul>
             
@@ -1145,7 +1179,7 @@
     <!--微信公众号二维码-->
 
   <div class="widget-wrap">
-    <h3 class="follow-title ">WeChat</h3>
+    <h3 class="follow-title ">微信公众号</h3>
     <div class="widget wechat-widget">
         <img src="http://blog.giscafer.com/static/images/qrcode_giscafer.jpg" alt="扫码关注" width="250"/>
     </div>

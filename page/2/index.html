@@ -65,6 +65,73 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-开发过程中webpack内存溢出问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2019-10-24T10:55:21.000Z" itemprop="datePublished">2019-10-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/">开发过程中webpack内存溢出问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <!-- Table of Contents -->
+        
+        <p>mage项目比较大，启动起来保存几下就崩溃了，如图：<br><img src="/image/20191024185854.jpg" alt="mage崩溃图"><br>google查阅相关资料，整个插件分析一下 webpack-bundle-analyzer</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> &#123; BundleAnalyzerPlugin &#125; = <span class="built_in">require</span>(<span class="string">'webpack-bundle-analyzer'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> BundleAnalyzerPlugin()</span><br></pre></td></tr></table></figure>
+<p>启动后发现，嚯，这么大。怪不得妹纸崩溃了。<br><img src="/image/20191024190619.jpg" alt="mage崩溃原因图"></p>
+<p>分析一下原因：</p>
+<ol>
+<li>项目本身太大了，开发过程中把所有入口的项目都打包了（hr pc端、hr移动端、 hm pc端、hm移动端等等）。</li>
+<li>使用的其他仓库的东西没有做按需加载（比如 moka UI）<br><img src="/image/20191024192752.jpg" alt="开发环境打包的js每个都含有 1M+ 大小的moka UI"></li>
+<li>三方库用的太多，挖掘机炒菜。（猜测很多库只用到了很小到一部分功能，对应的功能完全可以手动实现？）</li>
+</ol>
+<p>展望一下未来的优化思路以及解决方法：</p>
+<ol>
+<li>爷有钱，加内存！<br><img src="/image/20191024193632.jpg" alt="炫富"><br>4096不行，整上40960<br>很捞的方法，也是我正在使用的方法，优点是省事，缺点是除了省事没别的了，作为一位程序员还是要有不断优化项目的觉悟。</li>
+<li>曾经用过的一个方法，webpack按照路由编译，<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">entry: &#123;</span><br><span class="line">  app: [</span><br><span class="line">    <span class="built_in">require</span>.resolve(<span class="string">'./polyfills'</span>),</span><br><span class="line">    <span class="string">'react-hot-loader/patch'</span>,</span><br><span class="line">    config.startRoutes ? paths.appDevIndexJs : paths.appIndexJs</span><br><span class="line">  ]</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
+具体思路是两个参数(根目录整个config.js配置一下)，一个用来控制是否按路由启动， 第二个参数是传入的路由文件（组件），这样就把需要调试的地方渲染出来了，很快。（缺点是对路由文件的管理比较严格，改一改应该可以应用到mage项目里）<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  port: <span class="number">3000</span>,</span><br><span class="line">  proxy: &#123;</span><br><span class="line">    <span class="string">'/p'</span>: <span class="string">'http://test.mokahr.com'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  env: &#123;&#125;,</span><br><span class="line">  publicPath: <span class="string">'/'</span>,</span><br><span class="line">  eslint: <span class="literal">true</span>,</span><br><span class="line">  bundleAnalyzer: <span class="literal">false</span>,</span><br><span class="line">  autoOpenUrl: <span class="function"><span class="params">port</span> =&gt;</span> <span class="string">`http://test.mokahr.com:<span class="subst">$&#123;port&#125;</span>`</span>,</span><br><span class="line">  startRoutes: <span class="literal">false</span>,</span><br><span class="line">  routePath: <span class="string">'xxxxxx'</span></span><br><span class="line">  useTs: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>把不同的入口拆成不同的仓库，这样就能单独维护某一个端了。</li>
+<li>新的suger design 已经做按需加载了，很棒，应该就跟antd design + babel-plugin-import 的效果一样 引入对应的文件。</li>
+<li>网上找了个方法，还没来得及看，先放这儿了<br>使用webbpack-dev-serve钩子进行单独编译：在webpack-dev-serve中，有一个钩子before，在访问页面的时候我们能够拿到页面信息的路径，下面是实现<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// vue.config.js</span></span><br><span class="line"><span class="keyword">const</span> compiledPages = [];</span><br><span class="line">before(app) &#123;</span><br><span class="line">      app.get(<span class="string">'*.html'</span>, (req, res, next) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> result = req.url.match(<span class="regexp">/[^/]+?(?=\.)/</span>);</span><br><span class="line">        <span class="keyword">const</span> pageName = result &amp;&amp; result[<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">const</span> pagesName = <span class="built_in">Object</span>.keys(multiPageConfig);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pageName) &#123;</span><br><span class="line">          <span class="keyword">if</span> (pagesName.includes(pageName)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!compiledPages.includes(pageName)) &#123;</span><br><span class="line">              <span class="keyword">const</span> page = multiPageConfig[pageName];</span><br><span class="line">              fs.writeFileSync(<span class="string">`dev-entries/<span class="subst">$&#123;pageName&#125;</span>.js`</span>, <span class="string">`import '../<span class="subst">$&#123;page.tempEntry&#125;</span>'; // eslint-disable-line`</span>);</span><br><span class="line">              compiledPages.push(pageName);</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 没这个入口</span></span><br><span class="line">            res.writeHead(<span class="number">200</span>, &#123; <span class="string">'content-type'</span>: <span class="string">'text/html; charset=utf-8'</span> &#125;);</span><br><span class="line">            res.end(<span class="string">'&lt;p style="font-size: 50px;"&gt;不存在的入口&lt;/p&gt;'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        next();</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line"><span class="keyword">const</span> util = <span class="built_in">require</span>(<span class="string">'util'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> outputFile = util.promisify(fs.writeFile);</span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> tasks = [];</span><br><span class="line">  <span class="keyword">if</span> (!fs.existsSync(<span class="string">'dev-entries'</span>)) &#123;</span><br><span class="line">    fs.mkdirSync(<span class="string">'dev-entries'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">Object</span>.keys(pages).forEach(<span class="function">(<span class="params">key</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> entry = <span class="string">`dev-entries/<span class="subst">$&#123;key&#125;</span>.js`</span>;</span><br><span class="line">    pages[key].tempEntry = pages[key].entry; <span class="comment">// 暂存真正的入口文件地址</span></span><br><span class="line">    pages[key].entry = entry;</span><br><span class="line">    tasks.push(outputFile(entry, <span class="string">''</span>));</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">await</span> <span class="built_in">Promise</span>.all(tasks);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (process.env.NODE_ENV === <span class="string">'development'</span>) &#123;</span><br><span class="line">  main();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = pages;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/24/%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%ADwebpack%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98/" data-id="ckfcr0l1v000dlgjfgtpu3gvv" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+ 
+
+
+  
     <article id="post-TypeScript封装的一个fetch包" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" class="article-date">
@@ -108,7 +175,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ckd4r44o90001nwjfdns87kgq" class="article-share-link">分享</a>
+      <a data-url="http://yoursite.com/2019/08/30/TypeScript%E5%B0%81%E8%A3%85%E7%9A%84%E4%B8%80%E4%B8%AAfetch%E5%8C%85/" data-id="ckfcr0l1p0003lgjf7k91e9l8" class="article-share-link">分享</a>
       
       
       
@@ -148,6 +215,10 @@
       <ul>
         
           <li>
+            <a href="/2020/09/08/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/">发布订阅模式</a>
+          </li>
+        
+          <li>
             <a href="/2020/07/26/%E4%B8%80%E6%AC%A1%E7%88%AC%E8%99%AB%E7%9A%84%E5%AE%9E%E8%B7%B5/">一次爬虫的实践.md</a>
           </li>
         
@@ -161,10 +232,6 @@
         
           <li>
             <a href="/2020/04/27/%E4%B8%9A%E5%8A%A1%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E4%B8%AD%E4%B8%80%E4%BA%9B%E4%BA%8B%E6%83%85%E5%85%B3%E4%BA%8E%E5%A4%9A%E4%BA%BA%E5%8D%8F%E4%BD%9C%E7%9A%84%E8%AE%B0%E5%BD%95/">业务开发过程中一些事情关于多人协作的记录</a>
-          </li>
-        
-          <li>
-            <a href="/2020/03/30/%E4%BB%8E%E9%9B%B6%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E9%A1%B9%E7%9B%AE%E8%A6%81%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C%EF%BC%88%E4%BA%8C%EF%BC%89/">从零创建一个项目要做的工作（二）</a>
           </li>
         
       </ul>
